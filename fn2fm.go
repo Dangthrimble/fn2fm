@@ -28,42 +28,54 @@ import (
 
 func main() {
 
-	composersArrangers, err := readComposersArrangers()
+	var (
+		err  error
+		ca   map[string]string // Map of composers and arrangers with abbreviation as the key
+		file string            // Song's file
+		fn   string            // Song's filename without the path but including the extension
+		md   string            // Song's metadata embedded in the filename
+		comp string            // Song's composer(s)
+		arr  string            // Song's arranger(s)
+		key  string            // Song's initial key signature
+		acc  string            // Whether or not the song has an accompaniment
+	)
+
+	ca, err = readComposersArrangers()
 	if err != nil {
 		fmt.Printf("Unable to open file of Composers and Arrangers\n")
 		os.Exit(1)
 	}
 
-	for _, file := range os.Args[1:] {
+	for _, file = range os.Args[1:] {
 		fmt.Printf("Parsing %q...\n", file)
-		fn, err := validateFilenameAndExtension(file)
+		fn, err = validateFilenameAndExtension(file)
 		if err != nil {
 			os.Rename(file, file+"_rename")
 			continue
 		}
 
-		md, err := validateMetadataTags(fn)
+		md, err = validateMetadataTags(fn)
 		if err != nil {
 			os.Rename(file, file+"_rename")
 			continue
 		}
 
-		comp, err := parseComposers(md, composersArrangers)
+		comp, err = parseComposers(md, ca)
 		if err != nil {
 			continue
 		}
 
-		arr, err := parseArrangers(md, composersArrangers)
+		arr, err = parseArrangers(md, ca)
 		if err != nil {
 			continue
 		}
 
-		key, err := parseKey(md)
+		key, err = parseKey(md)
 		if err != nil {
 			continue
 		}
 
-		acc, err := parseAccompaniment(md)
+		acc, err = parseAccompaniment(md)
 		if err != nil {
 			continue
 		}
@@ -96,12 +108,17 @@ func main() {
 	}
 }
 
-func readComposersArrangers() (compArr map[string]string, err error) {
+func readComposersArrangers() (map[string]string, error) {
 
-	f, err := os.ReadFile("names.json")
+	var (
+		err error
+		f   []byte            // Contents of file of composers' and arrangers' abbreviations and names
+		ca  map[string]string // Map of composers and arrangers with abbreviation as the key
+	)
+	f, err = os.ReadFile("names.json")
 	if err != nil {
 		log.Println(err)
 	}
-	json.Unmarshal([]byte(f), &compArr)
-	return compArr, err
+	json.Unmarshal([]byte(f), &ca)
+	return ca, err
 }
