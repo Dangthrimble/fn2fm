@@ -1,2 +1,5 @@
-go 2.mod
+.DS_Store
+/fn2fm
+/fn2fm.exe
+/dist/
 fn2fm.code-workspace
