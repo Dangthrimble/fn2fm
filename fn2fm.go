@@ -8,7 +8,6 @@ It requires a JSON file names.json in the folder from which it is invoked.
 Usage:
 
 	fn2fm [file ...]
-
 */
 package main
 
@@ -18,6 +17,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sort"
+	"strings"
 )
 
 func main() {
@@ -114,5 +115,20 @@ func readComposersArrangers() (map[string]string, error) {
 		log.Println(err)
 	}
 	json.Unmarshal([]byte(f), &ca)
+	// Sort abbreviations so warnings have a consistent order.
+	abbreviations := make([]string, 0, len(ca))
+	for abbreviation := range ca {
+		abbreviations = append(abbreviations, abbreviation)
+	}
+	sort.Strings(abbreviations)
+	for _, abbreviation := range abbreviations {
+		if abbreviation != strings.TrimSpace(abbreviation) {
+			log.Printf("WARNING: names.json abbreviation %q has leading or trailing whitespace", abbreviation)
+		}
+		name := ca[abbreviation]
+		if name != strings.TrimSpace(name) {
+			log.Printf("WARNING: names.json name %q for abbreviation %q has leading or trailing whitespace", name, abbreviation)
+		}
+	}
 	return ca, err
 }

@@ -85,7 +85,7 @@ To minimise uncertainty, the filename must contain exactly one tilde. Filenames 
 The score metadata is formatted as follows and, apart from the limitation of no trailing spaces in the filename, each can have leading and trailing spaces if they aid readability (we just use a single space before and after the tilde):
 - <composer(s)\>_<arranger(s)\>\[<initialKeySignature\>\]<accompanimentIndicator\>
 
-<composer(s)\> and <arranger(s)\> are entered in abbreviated form, with the abbreviation being checked against a list of abbreviations and expanded forms maintained in ... (e.g. "JoRu" for "John Rutter"; "CtEcMr" for "Chris Tomlin, Ed Cash, Matt Redman"). If there are no composers, no text is required between the tilde ("~") and the underscore ("_"). if there are no arrangers, the underscore ("_") is not required and no text is required before the open square bracket ("\["). The choice of abbreviations is up to the individual.
+<composer(s)\> and <arranger(s)\> are entered in abbreviated form, with the abbreviation being checked against a list of abbreviations and expanded forms maintained in `names.json` (e.g. "JoRu" for "John Rutter"; "CtEcMr" for "Chris Tomlin, Ed Cash, Matt Redman"). If there are no composers, no text is required between the tilde ("~") and the underscore ("_"). if there are no arrangers, the underscore ("_") is not required and no text is required before the open square bracket ("\["). The choice of abbreviations is up to the individual.
 
 <initialKeySignature\> is required. Specify the actual major or minor key where known, using `#` for sharp, `b` for flat and `m` for minor (e.g. `[C]`, `[F#]` or `[F#m]`). This allows fn2fm to write the forScore "Key" metadata.
 
@@ -94,6 +94,20 @@ If the actual key is not known, use the number of accidentals as a fallback: `[0
 Empty brackets (`[]`) and brackets containing only spaces are rejected. Always supply either the actual key or the accidental count. Different keys can share the same accidental count, so use the actual key where known.
 
 <accompanimentIndicator\> can be a plus ("+") for a tag that states "With Accompaniment", a hyphen/minus ("-") for a tag that states "Without Accompaniment", or left blank for no accompaniment tag.
+
+## Name dictionary
+
+The supplied `names.json` is a starter dictionary; customise it for your own scores.
+fn2fm loads `names.json` from the current working directory (the folder from which
+you run the command). You can keep it with the PDFs you work on and edit it there;
+it does not need to be beside the executable.
+
+When loading the dictionary, fn2fm warns if an abbreviation or name has leading
+or trailing whitespace. Warnings identify the affected entry. Processing continues
+with leading and trailing whitespace removed from names before they are used as
+composer or arranger metadata. Abbreviations are not automatically corrected, and
+the dictionary file is not rewritten. Spaces within names, such as `Dan Forrest`,
+are preserved.
 
 ## Examples
 

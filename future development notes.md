@@ -39,7 +39,8 @@ Do not interpret this as an intentional decision to abandon the tilde convention
   `/Users/jonathan/Documents/Choir/Cambrensis/New Songs/names.json`.
   Its 73 entries include all entries in the two source dictionaries with identical
   values and cover all seven real filenames. `DaFo` maps to `" Dan Forrest"`,
-  including the leading space; this has not been corrected.
+  including the leading space in the preserved snapshot. On 19 September 2026,
+  the maintainer reported removing it from the live working dictionary.
 - A baseline snapshot of the separate tilde source tree, working executable and
   working dictionary is preserved at `baseline-snapshots/20260918T192323Z/`.
   All 14 copied files were verified against their originals using SHA-256;
@@ -114,6 +115,20 @@ and minor keys share an accidental count). The README now reflects this decision
 the parser already rejected empty keys, and regression tests cover this behaviour.
 Semicolon backward compatibility was also explicitly rejected (see above).
 
+## Dictionary requirements (19 September 2026)
+
+- The repository dictionary is an exemplar/starter, not a copy of the maintainer's
+  full working dictionary. Do not replace it with the 73-entry personal list.
+- Loading `names.json` from the current working directory is intentional: it lets
+  users keep and edit their dictionary alongside the PDFs they are working on.
+  No executable-directory lookup is needed for this workflow.
+- Added warnings on load for leading or trailing whitespace in abbreviations or
+  expanded names. Processing continues, with leading and trailing whitespace
+  stripped from names when producing composer/arranger metadata. Internal spaces
+  are preserved. Abbreviations and dictionary files are not automatically changed.
+  The baseline fixture retains its historical leading space; the regression now
+  expects the trimmed metadata name while preserving the dictionary value.
+
 ## Paused ExifTool replacement investigation
 
 The setup conversation proposed comparing ExifTool with pdfcpu before committing
@@ -150,9 +165,8 @@ These findings were also checked against the local source on 18 September 2026:
 
 Further proposals from the earlier review:
 
-- Make name-dictionary discovery robust when the working directory differs from
-  the executable directory. Consider an explicit path option and documented lookup
-  rules; keep dictionaries customisable rather than permanently baking in one.
+- An explicit dictionary-path option was an earlier suggestion, not an agreed
+  change. Current-working-directory lookup is intentional (see requirements above).
 - Reconcile README name-code examples with the supplied dictionary; consider an
   example dictionary or overridable defaults.
 - Add command-line help/options and integration tests. Extend existing tests for

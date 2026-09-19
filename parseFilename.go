@@ -162,7 +162,7 @@ func findComposersOrArrangers(key string, ca map[string]string) (string, error) 
 		return "", errors.New(fmt.Sprintf("composers or arrangers not found"))
 	}
 
-	return names, nil
+	return strings.TrimSpace(names), nil
 }
 
 func parseKey(md string) (string, error) {

@@ -312,7 +312,7 @@ func TestRealFilenames(t *testing.T) {
 	cases := []struct{ filename, composer, arranger, key string }{
 		{"See Amid The Winter Snow ~ JoGo_DWil[G]+.pdf", "John Goss", "David Willcocks", "keysf:1, keymi:0"},
 		{"Lo How a Rose E'er Blooming ~ _HoHe[F]+.pdf", "", "Howard Helvey", "keysf:-1, keymi:0"},
-		{"Angels We Have Heard On High ~ _DaFo [G]+.pdf", "", " Dan Forrest", "keysf:1, keymi:0"},
+		{"Angels We Have Heard On High ~ _DaFo [G]+.pdf", "", "Dan Forrest", "keysf:1, keymi:0"},
 		{"All Are Welcome ~ MHau[F]+.pdf", "Marty Haugen", "", "keysf:-1, keymi:0"},
 		{"Let Thy Hand #2 Let Justice And Judgement ~ GFHa[Em]+.pdf", "George Frideric Handel", "", "keysf:1, keymi:1"},
 		{"Celebro (Stella Natalis) ~ KaJe[4b]+.pdf", "Karl Jenkins", "", ""},
@@ -351,6 +351,29 @@ func TestRealFilenames(t *testing.T) {
 				t.Fatalf("unexpected metadata: composer=%q arranger=%q key=%q accompaniment=%q", comp, arr, key, acc)
 			}
 			t.Logf("composer=%q arranger=%q key=%q accompaniment=%q", comp, arr, key, acc)
+		})
+	}
+}
+
+func TestMetadataNamesTrimWhitespace(t *testing.T) {
+	for _, original := range []string{" Dan Forrest", "Dan Forrest ", "\t\u00a0Dan Forrest\n", "  Dan  Forrest  "} {
+		t.Run(original, func(t *testing.T) {
+			names := map[string]string{"DaFo": original}
+			want := "Dan Forrest"
+			if original == "  Dan  Forrest  " {
+				want = "Dan  Forrest"
+			}
+			composer, err := parseComposers("DaFo[G]+", names)
+			if err != nil || composer != want {
+				t.Fatalf("composer = %q, %v; want %q", composer, err, want)
+			}
+			arranger, err := parseArrangers("_DaFo[G]+", names)
+			if err != nil || arranger != want {
+				t.Fatalf("arranger = %q, %v; want %q", arranger, err, want)
+			}
+			if names["DaFo"] != original {
+				t.Fatal("dictionary value was changed")
+			}
 		})
 	}
 }
