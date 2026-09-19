@@ -65,6 +65,8 @@ In addition:
 - Dropbox says to avoid special characters (without specifying what constitutes a special character) and doesn't support names with trailing spaces
 - Box only supports the [Unicode Basic Multilingual Plane (BMP)](https://codepoints.net/basic_multilingual_plane) characters and doesn't support names with leading or trailing spaces
 
+Semicolons (`;`) are also forbidden throughout the filename. Only `~` is supported as the metadata separator; semicolon-based filenames are rejected.
+
 ## fn2fm Score Naming Convention
 
 The naming convention used by fn2fm has been developed to support the needs of our choir [Cambrensis](https://www.cambrensis.org.uk/), uses only [7-bit ASCII printable characters](https://www.ascii-code.com/characters/printable-characters) constrained by the characters to be avoided listed above, and supports the following metadata:
@@ -74,18 +76,22 @@ The naming convention used by fn2fm has been developed to support the needs of o
 - Initial key signature
 - Whether or not the score includes an accompaniment (this is visible in the forScore "Tag(s)")
 
-The filename is constructed from two parts separated by a semicolon (";"):
+The filename is constructed from two parts separated by a tilde ("~"):
 - The score title
 - The score metadata
 
-To minimise uncertainty, the filename must contain exactly one semicolon. If there is no semicolon present, there is no metadata and therefore nothing for fn2fm to do. If there are two or more, fn2fm will not know which separates the score title from the metadata and the filename will be rejected.
+To minimise uncertainty, the filename must contain exactly one tilde. Filenames without a tilde are rejected. If there are two or more, fn2fm will not know which separates the score title from the metadata and the filename will be rejected.
 
-The score metadata is formatted as follows and, apart from the limitation of no trailing spaces in the filename, each can have leading and trailing spaces if they aid readability (we just use a single space after the semicolon):
+The score metadata is formatted as follows and, apart from the limitation of no trailing spaces in the filename, each can have leading and trailing spaces if they aid readability (we just use a single space before and after the tilde):
 - <composer(s)\>_<arranger(s)\>\[<initialKeySignature\>\]<accompanimentIndicator\>
 
-<composer(s)\> and <arranger(s)\> are entered in abbreviated form, with the abbreviation being checked against a list of abbreviations and expanded forms maintained in ... (e.g. "JoRu" for "John Rutter"; "CtEcMr" for "Chris Tomlin, Ed Cash, Matt Redman"). If there are no composers, no text is required between the semicolon (";") and the underscore ("_"). if there are no arrangers, the underscore ("_") is not required and no text is required before the open square bracket ("\["). The choice of abbreviations is up to the individual.
+<composer(s)\> and <arranger(s)\> are entered in abbreviated form, with the abbreviation being checked against a list of abbreviations and expanded forms maintained in ... (e.g. "JoRu" for "John Rutter"; "CtEcMr" for "Chris Tomlin, Ed Cash, Matt Redman"). If there are no composers, no text is required between the tilde ("~") and the underscore ("_"). if there are no arrangers, the underscore ("_") is not required and no text is required before the open square bracket ("\["). The choice of abbreviations is up to the individual.
 
-<initialKeySignature\> can be entered as either the number of accidentals (sharps or flats), or the major or minor key. The number sign/hash ("#") is used for the sharp symbol and lowercase "B" ("b") for the flat symbol (e.g. "0" or "C" for C major; "1#" for one sharp; "2b" for two flats; "F#" for F sharp major; "F#m" for F sharp minor). The forScore "Key" metadata can only be updated if the major or minor key signature is provided. If no key signature is provided, empty square brackets ("[]") should still be included in the filename.
+<initialKeySignature\> is required. Specify the actual major or minor key where known, using `#` for sharp, `b` for flat and `m` for minor (e.g. `[C]`, `[F#]` or `[F#m]`). This allows fn2fm to write the forScore "Key" metadata.
+
+If the actual key is not known, use the number of accidentals as a fallback: `[0]` for no sharps or flats, `[1#]` through `[7#]` for sharps, or `[1b]` through `[7b]` for flats. These counts produce no forScore key metadata and do not imply major or minor. They retain key-signature information in the filename, helping distinguish copies of the same song with different key signatures.
+
+Empty brackets (`[]`) and brackets containing only spaces are rejected. Always supply either the actual key or the accidental count. Different keys can share the same accidental count, so use the actual key where known.
 
 <accompanimentIndicator\> can be a plus ("+") for a tag that states "With Accompaniment", a hyphen/minus ("-") for a tag that states "Without Accompaniment", or left blank for no accompaniment tag.
 
@@ -93,32 +99,32 @@ The score metadata is formatted as follows and, apart from the limitation of no 
 
 In all these examples, the forScore Title will be the same as the filename, without the ".pdf" file extension
 
-- O Magnum Mysterium; MoLa[2#].pdf
+- O Magnum Mysterium ~ MoLa[2#].pdf
   - Composers: Morten Lauridsen
   - Arrangers:
   - Key:
   - Tags:
-- Spirit Of The Season; GbAs_DaHa[Ab]+.pdf
+- Spirit Of The Season ~ GbAs_DaHa[Ab]+.pdf
   - Composers: Glen Ballard, Alan Silvestri
   - Arrangers: David Hamilton
   - Key: A♭
   - Tags: With Accompaniment
-- African Noel; _AnTh[2b]+.pdf
+- African Noel ~ _AnTh[2b]+.pdf
   - Composers: 
   - Arrangers: André J Thomas
   - Key:
   - Tags: With Accompaniment
-- Total Praise; RiSm[5b]-.pdf
+- Total Praise ~ RiSm[5b]-.pdf
   - Composers: Richard Smallwood
   - Arrangers:
   - Key:
   - Tags: Without Accompaniment
-- Sing with Joy at Christmas (Stella Natalis); KaJe[C]+.pdf
+- Sing with Joy at Christmas (Stella Natalis) ~ KaJe[C]+.pdf
   - Composers: Karl Jenkins
   - Arrangers:
   - Key: C
   - Tags: With Accompaniment
-- The Witness 16 The Victor; JaOc[0]+.pdf
+- The Witness 16 The Victor ~ JaOc[0]+.pdf
   - Composers: Jamie Owens Collins
   - Arrangers:
   - Key:

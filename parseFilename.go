@@ -10,7 +10,7 @@ import (
 
 const (
 	validExt   = ".pdf"
-	mdPrefix   = ";"
+	mdPrefix   = "~"
 	arrPrefix  = "_"
 	keyPrefix  = "["
 	keySuffix  = "]"
@@ -19,9 +19,9 @@ const (
 )
 
 const (
-	minPrintASCII = '\u0020'       // Minimum printable ASCII value
-	maxPrintASCII = '\u007E'       // Maximum printable ASCII value
-	charToAvoid   = "\"*./:<>?\\|" // Characters to avoid according to cloud storage
+	minPrintASCII = '\u0020'        // Minimum printable ASCII value
+	maxPrintASCII = '\u007E'        // Maximum printable ASCII value
+	charToAvoid   = "\"*./:;<>?\\|" // Characters to avoid according to cloud storage
 )
 
 func validateFilenameAndExtension(fnExt string) (string, error) {

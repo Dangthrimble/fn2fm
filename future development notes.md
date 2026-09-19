@@ -24,6 +24,34 @@ versions differ. A commit date is not the original creation date of its source,
 and a filesystem timestamp alone does not establish a binary's source revision.
 Do not interpret this as an intentional decision to abandon the tilde convention.
 
+### Tilde-only reconciliation (18 September 2026)
+
+- The maintainer explicitly chose tilde-only behaviour. The Git parser now requires
+  exactly one `~` and forbids semicolons anywhere in the filename; semicolon
+  backward compatibility is not supported. Earlier descriptions of the Git parser
+  using a semicolon below record the pre-reconciliation state.
+- Updated the existing tests and README separator examples. Added regression tests
+  for semicolon rejection, repeated tildes and all seven real filenames, using a
+  small fixture from the working dictionary. The module structure and earlier
+  refactoring are retained. Broader named-key behaviour is unchanged. Empty keys remain rejected, as
+  explicitly confirmed by the maintainer below.
+- The maintainer identified the working dictionary as
+  `/Users/jonathan/Documents/Choir/Cambrensis/New Songs/names.json`.
+  Its 73 entries include all entries in the two source dictionaries with identical
+  values and cover all seven real filenames. `DaFo` maps to `" Dan Forrest"`,
+  including the leading space; this has not been corrected.
+- A baseline snapshot of the separate tilde source tree, working executable and
+  working dictionary is preserved at `baseline-snapshots/20260918T192323Z/`.
+  All 14 copied files were verified against their originals using SHA-256;
+  `manifest.json` records provenance and `SHA256SUMS` records checksums.
+- After applying the reconciliation, all 36 parser cases passed in the Git
+  repository, including four separator-rejection cases. `go vet ./...` and
+  `git diff --check` also passed. The working executable was not rebuilt.
+- Before editing the Git source, disposable copies of both source variants passed
+  their 25 existing cases and seven real filename cases after adapting the Git
+  copy to tilde-only behaviour. These are parser checks, not proof of executable
+  equivalence or PDF/forScore behaviour. No PDFs were processed.
+
 ### Executable source located (18 September 2026)
 
 Inspection of `/Users/jonathan/go/bin/fn2fm` found Go 1.21.5 build information
@@ -77,9 +105,14 @@ Use representative real filenames as regression cases, with suitable name-map
 fixtures, when reconciling the parser, tests and README. Locate and preserve the
 working executable and its matching name dictionary; if possible, identify its
 source/build provenance. Use disposable PDF copies for behaviour comparisons.
-Empty brackets `[]` are another unresolved discrepancy: the README allows them,
-but the checked-in key parser rejects them. Semicolon backward compatibility and
-empty-key behaviour need an explicit decision, rather than an accidental change.
+The maintainer explicitly chose to reject empty brackets `[]`, including brackets
+containing only spaces. Specify the actual key where known; otherwise use an
+accidental count (`0` or `1`–`7` followed by `#` or `b`) as a fallback. Counts
+produce no forScore key metadata but retain distinguishing information in the
+filename. They do not distinguish all possible keys (for example, relative major
+and minor keys share an accidental count). The README now reflects this decision;
+the parser already rejected empty keys, and regression tests cover this behaviour.
+Semicolon backward compatibility was also explicitly rejected (see above).
 
 ## Paused ExifTool replacement investigation
 
