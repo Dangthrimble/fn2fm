@@ -25,6 +25,25 @@ func TestBuiltExecutable(t *testing.T) {
 	if info, err := os.Stat(binary); err != nil || !info.Mode().IsRegular() {
 		t.Fatalf("cannot use built app %q: %v", binary, err)
 	}
+	t.Run("version without a dictionary", func(t *testing.T) {
+		dir := t.TempDir()
+		cmd := exec.Command(binary, "--version")
+		cmd.Dir = dir
+		cmd.Env = append(os.Environ(), "PATH="+dir)
+		output, err := cmd.CombinedOutput()
+		want := os.Getenv("FN2FM_TEST_VERSION")
+		if want == "" {
+			want = "dev"
+		}
+		expected := "fn2fm " + want + " (" + runtime.GOOS + "/" + runtime.GOARCH + ")\n"
+		if err != nil || string(output) != expected {
+			t.Fatalf("version returned %q, %v; want %q", output, err, expected)
+		}
+		entries, _ := os.ReadDir(dir)
+		if len(entries) != 0 {
+			t.Fatal("version command created files")
+		}
+	})
 
 	for _, tc := range []struct {
 		fixture, filename string

@@ -1,0 +1,85 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-intel
+            runner: macos-15-intel
+            binary: fn2fm
+          - platform: macos-apple-silicon
+            runner: macos-15
+            binary: fn2fm
+          - platform: windows-x64
+            runner: windows-2025
+            binary: fn2fm.exe
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CGO_ENABLED: '0'
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Run tests
+        run: go test -count=1 -v ./...
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Identify development version
+        run: |
+          $version = "dev-$env:GITHUB_RUN_NUMBER-$($env:GITHUB_SHA.Substring(0, 12))"
+          "FN2FM_VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Build versioned standalone executable
+        run: go build -trimpath -ldflags "-X main.version=$env:FN2FM_VERSION" -o "dist/${{ matrix.binary }}" .
+
+      - name: Test the built executable on disposable PDFs
+        run: |
+          $env:FN2FM_TEST_BINARY = (Resolve-Path -LiteralPath 'dist/${{ matrix.binary }}').Path
+          $env:FN2FM_TEST_VERSION = $env:FN2FM_VERSION
+          go test -count=1 -v -run '^TestBuiltExecutable$' .
+
+      - name: Package executable and instructions
+        run: go run ./internal/buildpackage -binary "dist/${{ matrix.binary }}" -version "$env:FN2FM_VERSION"
+
+      - name: Upload development package
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fn2fm-${{ env.FN2FM_VERSION }}-${{ matrix.platform }}
+          path: dist/packages/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          overwrite: true

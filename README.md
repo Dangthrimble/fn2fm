@@ -1,5 +1,17 @@
 # fn2fm - Filename to forScore Metadata
 
+## Downloads and updates
+
+Download versioned development packages from successful **Build and test** runs
+on the repository's [Actions page](https://github.com/Dangthrimble/fn2fm/actions).
+Packages are provided for macOS Intel, macOS Apple Silicon and Windows x64, with
+an executable, instructions, checksums and dependency notices. They contain
+`names.example.json`; your working `names.json` stays separate.
+
+See [installation and manual-update instructions](INSTALL.md). Use
+`fn2fm --version` to identify a build. Updates are manual; dedicated installers,
+automatic updates, signing and notarisation are not included in these builds.
+
 ## Running fn2fm
 
 fn2fm writes PDF metadata directly using the bundled pdfcpu library. ExifTool is
@@ -42,14 +54,15 @@ require a Go installation. Automated runtime tests have passed on Windows Server
 Run `go test ./...` and `go vet ./...` from the repository root. Tests use generated
 PDF fixtures and temporary folders; no personal score collection is required.
 
-The [Windows workflow](.github/workflows/windows.yml) is configured to run on
-pushes and pull requests. It runs the tests on Windows x64, builds `fn2fm.exe`,
-then exercises that executable with external programs unavailable. These checks
+The [build workflow](.github/workflows/build.yml) runs on pushes and pull requests
+on both macOS architectures and Windows x64. It builds and tests each executable
+with external programs unavailable, then creates a verified package. These checks
 cover metadata, paths with spaces, repeated updates, backups, rejected PDFs and
 replacement failure while a Windows process holds the PDF open.
 
 To run the executable checks locally, build fn2fm, set `FN2FM_TEST_BINARY` to its
-absolute path, and run `go test -count=1 -v -run '^TestBuiltExecutable$' .`.
+absolute path, and run `go test -count=1 -v -run '^TestBuiltExecutable$' .`. For a
+version-stamped binary, also set `FN2FM_TEST_VERSION` to the embedded version.
 Without that variable, the executable checks are skipped; the Windows file-lock
 case also skips on other operating systems. These automated checks do not test
 the display of properties or pages in desktop PDF readers.

@@ -418,6 +418,34 @@ form dictionaries prompted the separate preservation experiment below.
 - Next proposed step: prepare downloadable development builds for macOS Intel,
   macOS Apple Silicon and Windows x64.
 
+### Versioned development packages (21 September 2026)
+
+- The maintainer approved ready-to-run versioned packages and manual installation/
+  update instructions. Dedicated installers and automatic updates are separate
+  future work; no stable GitHub Release or installation over the working binary
+  is part of this step.
+- Added `--version`, which works without a dictionary or PDF arguments. The build
+  workflow embeds `dev-<run number>-<12-character commit>` in each executable.
+- Replaced the Windows-only workflow with `build.yml`: native macOS Intel,
+  macOS Apple Silicon and Windows x64 runners test and vet the source, build each
+  versioned executable and exercise it before creating a ZIP. Successful push
+  and manual runs upload development artifacts retained for 30 days; pull requests
+  test packaging without uploading downloads.
+- `internal/buildpackage` includes the executable, `INSTALL.md`, README, version/
+  commit/platform details, content/archive SHA-256 checksums and dependency licence
+  notices. It verifies the actual executable's version and every ZIP entry's bytes
+  and permissions. The starter dictionary is packaged as `names.example.json`,
+  preventing extraction from replacing a personal `names.json`.
+- `INSTALL.md` covers choosing a platform, first use from Terminal/PowerShell,
+  dictionary placement, manual updates, rollback and checksum checks. These builds
+  have no Developer ID/notarisation or Windows publisher certificate. The project's
+  own licence remains undecided; packaging dependency notices does not select one.
+- Local macOS tests and vet passed, including the version command without a
+  dictionary and ZIP preservation/checksum tests. An extracted Intel package ran
+  with the expected version; independent checks verified its ZIP/content hashes,
+  executable permission and absence of a packaged working `names.json`.
+  Hosted three-platform packaging results will be recorded after the workflow runs.
+
 ### Earlier investigation context
 
 The setup conversation proposed comparing ExifTool with pdfcpu before committing
@@ -499,8 +527,8 @@ Further proposals from the earlier review:
   filename, rather than requiring the user to rename it first.
 - Support renaming files with password-protected metadata.
 - Check filename uniqueness against existing files.
-- Prepare distribution builds for the standalone writer; initial automated
-  Windows runtime verification has passed (see the hosted run above).
+- Verify and publish the versioned development packages described above; initial
+  automated Windows runtime verification has passed.
 - Add a configuration file for genre or arranger handling; define the supported
   choices and metadata mapping before implementation.
 - Optionally retain configuration between application invocations, including a

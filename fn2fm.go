@@ -16,11 +16,19 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 )
 
+// Set by the build workflow; source builds retain the development label.
+var version = "dev"
+
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--version" {
+		fmt.Printf("fn2fm %s (%s/%s)\n", version, runtime.GOOS, runtime.GOARCH)
+		return
+	}
 
 	var (
 		err    error
