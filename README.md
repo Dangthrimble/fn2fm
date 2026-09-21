@@ -34,7 +34,8 @@ not a method for permanently erasing old metadata.
 
 Building from source now requires Go 1.25 or newer. Use `go build -o dist/fn2fm .`
 on macOS or `go build -o dist/fn2fm.exe .` on Windows. The compiled app does not
-require a Go installation. Windows runtime verification is still outstanding.
+require a Go installation. Automated runtime tests have passed on Windows Server
+2025 x64; desktop PDF reader behaviour has not been manually checked on Windows.
 
 ## Automated testing
 

@@ -394,6 +394,30 @@ form dictionaries prompted the separate preservation experiment below.
   Keep baseline snapshots, personal score outputs and local binaries out of the
   commit; those are investigation artifacts, not required workflow inputs.
 
+### First successful hosted Windows run (21 September 2026)
+
+- With the maintainer's approval, committed and pushed the standalone app, tests,
+  generated fixtures, workflow and notes as `07d4700` on `improve-cross-platform`.
+  This includes the newly requested persistent output-location configuration
+  (including Box/Dropbox) and shared `names.json` options in the backlog below;
+  those options remain future work, not implemented behaviour.
+- Added `.gitattributes` to treat PDFs as binary. This prevents Windows checkout
+  from converting fixture line endings and invalidating PDF byte offsets.
+  Personal PDFs, working dictionary, installed executable, baseline snapshots and
+  local investigation/build artifacts were excluded from the commit and push.
+- GitHub Actions [run 35550647408](https://github.com/Dangthrimble/fn2fm/actions/runs/35550647408)
+  completed successfully on Windows Server 2025 x64 using Go 1.25.0. All tests,
+  vet, standalone executable build and executable-level checks passed. The log
+  confirms the Windows open-file/replacement/retry case ran and passed, rather
+  than being skipped. Both cross-reference formats, title-only metadata, repeated
+  updates, first backups, paths with spaces and rejected input passed as well.
+- This is actual automated Windows execution, not cross-compilation alone. It
+  does not establish PDF-reader display behaviour, other Windows versions or
+  universal PDF compatibility. The local music files, backups, dictionary and
+  installed legacy executable were rechecked by hash and remain unchanged.
+- Next proposed step: prepare downloadable development builds for macOS Intel,
+  macOS Apple Silicon and Windows x64.
+
 ### Earlier investigation context
 
 The setup conversation proposed comparing ExifTool with pdfcpu before committing
@@ -475,8 +499,8 @@ Further proposals from the earlier review:
   filename, rather than requiring the user to rename it first.
 - Support renaming files with password-protected metadata.
 - Check filename uniqueness against existing files.
-- Complete Windows runtime verification and release preparation for the standalone
-  writer, now integrated into the development source.
+- Prepare distribution builds for the standalone writer; initial automated
+  Windows runtime verification has passed (see the hosted run above).
 - Add a configuration file for genre or arranger handling; define the supported
   choices and metadata mapping before implementation.
 - Optionally retain configuration between application invocations, including a
