@@ -444,7 +444,25 @@ form dictionaries prompted the separate preservation experiment below.
   dictionary and ZIP preservation/checksum tests. An extracted Intel package ran
   with the expected version; independent checks verified its ZIP/content hashes,
   executable permission and absence of a packaged working `names.json`.
-  Hosted three-platform packaging results will be recorded after the workflow runs.
+- Committed and pushed the packaging implementation as `866c1d7`. GitHub Actions
+  [run 35565795539](https://github.com/Dangthrimble/fn2fm/actions/runs/35565795539)
+  completed successfully for all three native platforms using Go 1.25.0. Tests,
+  vet, executable-level checks, packaging and artifact uploads passed. The
+  published development version is `dev-1-866c1d767085`.
+- Downloaded all three packages to ignored `dist/development/35565795539/` and
+  independently verified their archive checksums and all 22 entries in each ZIP.
+  Each records the expected source commit and an unmodified source checkout;
+  executable permissions and the example-only dictionary were verified. The
+  downloaded Intel executable also returned the expected version on this Mac.
+  Verification evidence is in `output/builds/35565795539/download-verification.json`.
+- Hash checks confirmed the installed legacy executable, personal dictionary,
+  original score files and their existing backups remain unchanged. These checks
+  establish package integrity and automated runtime results, not new manual
+  PDF-reader checks or signed-installer compatibility.
+- Development artifact downloads require GitHub sign-in and expire on
+  21 October 2026. A stable release, dedicated installers and automatic updates
+  remain future work. Next proposed step: choose the project's licence before
+  preparing a stable public release.
 
 ### Earlier investigation context
 
@@ -527,8 +545,11 @@ Further proposals from the earlier review:
   filename, rather than requiring the user to rename it first.
 - Support renaming files with password-protected metadata.
 - Check filename uniqueness against existing files.
-- Verify and publish the versioned development packages described above; initial
-  automated Windows runtime verification has passed.
+- Prepare a stable release after selecting the project licence. Versioned
+  development packages and native automated checks for all three initial
+  platforms are complete (see above).
+- Consider dedicated installers and automatic updates; current packages use
+  manual installation and manual updates as documented in `INSTALL.md`.
 - Add a configuration file for genre or arranger handling; define the supported
   choices and metadata mapping before implementation.
 - Optionally retain configuration between application invocations, including a
@@ -540,7 +561,7 @@ Further proposals from the earlier review:
   shared dictionary is located and how updates and concurrent edits are handled;
   the current per-working-directory dictionary behaviour remains unchanged.
 - Refactor the code toward more idiomatic Go.
-- Support builds for multiple platforms.
+- Consider additional platforms beyond the three supported development builds.
 - Investigate forScore PDF-metadata parsing compatibility, particularly shared
   setlists when users have different metadata-parsing settings.
 
