@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"sort"
 	"strings"
 )
@@ -24,20 +23,21 @@ import (
 func main() {
 
 	var (
-		err  error
-		ca   map[string]string // Map of composers and arrangers with abbreviation as the key
-		file string            // Song's file
-		fn   string            // Song's filename without the path but including the extension
-		md   string            // Song's metadata embedded in the filename
-		comp string            // Song's composer(s)
-		arr  string            // Song's arranger(s)
-		key  string            // Song's initial key signature
-		acc  string            // Whether or not the song has an accompaniment
+		err    error
+		ca     map[string]string // Map of composers and arrangers with abbreviation as the key
+		file   string            // Song's file
+		fn     string            // Song's filename without the path but including the extension
+		md     string            // Song's metadata embedded in the filename
+		comp   string            // Song's composer(s)
+		arr    string            // Song's arranger(s)
+		key    string            // Song's initial key signature
+		acc    string            // Whether or not the song has an accompaniment
+		failed bool              // Whether a PDF update failed
 	)
 
 	ca, err = readComposersArrangers()
 	if err != nil {
-		fmt.Printf("Unable to open file of Composers and Arrangers\n")
+		fmt.Printf("Unable to load names.json: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -80,26 +80,18 @@ func main() {
 		fmt.Printf("            Key: %q\n", key)
 		fmt.Printf("  Accompaniment: %q\n\n", acc)
 
-		title := "-PDF:Title=" + fn
-		auth := "-PDF:Author=" + comp
-		subj := "-PDF:Subject=" + arr
-		kw := "-PDF:Keywords="
-		if len(key) > 0 {
-			if len(key) > 0 {
-				kw = kw + key + ", " + acc
-			} else {
-				kw = kw + key
-			}
-		} else {
-			kw = kw + acc
-		}
-		cmd := exec.Command("exiftool", file, title, auth, subj, kw)
-		err = cmd.Run()
+		err = writePDFMetadata(file, pdfMetadata{
+			Title: fn, Author: comp, Subject: arr, Keywords: metadataKeywords(key, acc),
+		})
 		if err != nil {
-			log.Print(err)
-			os.Rename(file, file+"_error")
+			log.Printf("Unable to update %q: %v", file, err)
+			failed = true
 			continue
 		}
+		fmt.Printf("  Updated PDF metadata\n")
+	}
+	if failed {
+		os.Exit(1)
 	}
 }
 
@@ -113,8 +105,11 @@ func readComposersArrangers() (map[string]string, error) {
 	f, err = os.ReadFile("names.json")
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
-	json.Unmarshal([]byte(f), &ca)
+	if err := json.Unmarshal(f, &ca); err != nil {
+		return nil, fmt.Errorf("invalid names.json: %w", err)
+	}
 	// Sort abbreviations so warnings have a consistent order.
 	abbreviations := make([]string, 0, len(ca))
 	for abbreviation := range ca {

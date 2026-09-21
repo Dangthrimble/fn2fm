@@ -1,5 +1,58 @@
 # fn2fm - Filename to forScore Metadata
 
+## Running fn2fm
+
+fn2fm writes PDF metadata directly using the bundled pdfcpu library. ExifTool is
+no longer required. Keep your editable `names.json` in the folder from which you
+run fn2fm, and pass the PDF filenames as arguments, quoting names with spaces:
+
+```text
+fn2fm "O Holy Night ~ AdAd_DaFo[Bb]+.pdf"
+```
+
+The writer supports unencrypted PDF versions 1.4 through 1.7, including PDFs with
+no existing metadata dictionary. It currently rejects signed PDFs, signature
+fields, hybrid cross-reference files and files requiring cross-reference repair.
+Unsupported files and failed PDF updates keep their original filename and contents;
+the command reports the error and exits with a nonzero status if any PDF update
+fails. Existing filename/tag validation still renames rejected filenames with
+the `_rename` suffix.
+
+Each update is written to a temporary file in the PDF's folder and verified before
+replacing the PDF. The first original is saved as `<filename>.pdf_original`;
+an existing regular backup is kept without being overwritten. The folder must
+be writable, and symbolic links are not followed. Close other PDF editors before
+processing the file. Basic file permissions are retained; filesystem timestamps,
+extended attributes and ACLs are not copied to the replacement.
+
+Only the PDF Info Title, Author, Subject and Keywords are updated. An absent
+composer, arranger, key or accompaniment removes the corresponding metadata
+where applicable. Existing PDF dates, Producer and XMP are preserved. Acrobat
+may therefore continue to display older XMP values, as it did with the legacy
+ExifTool workflow. Incremental updates retain previous PDF revisions; this is
+not a method for permanently erasing old metadata.
+
+Building from source now requires Go 1.25 or newer. Use `go build -o dist/fn2fm .`
+on macOS or `go build -o dist/fn2fm.exe .` on Windows. The compiled app does not
+require a Go installation. Windows runtime verification is still outstanding.
+
+## Automated testing
+
+Run `go test ./...` and `go vet ./...` from the repository root. Tests use generated
+PDF fixtures and temporary folders; no personal score collection is required.
+
+The [Windows workflow](.github/workflows/windows.yml) is configured to run on
+pushes and pull requests. It runs the tests on Windows x64, builds `fn2fm.exe`,
+then exercises that executable with external programs unavailable. These checks
+cover metadata, paths with spaces, repeated updates, backups, rejected PDFs and
+replacement failure while a Windows process holds the PDF open.
+
+To run the executable checks locally, build fn2fm, set `FN2FM_TEST_BINARY` to its
+absolute path, and run `go test -count=1 -v -run '^TestBuiltExecutable$' .`.
+Without that variable, the executable checks are skipped; the Windows file-lock
+case also skips on other operating systems. These automated checks do not test
+the display of properties or pages in desktop PDF readers.
+
 ## forScore Metadata
 
 By default, scores and bookmarks in forScore 14.0 can be tagged with the following [forScore metadata](https://forscore.co/documentation/metadata/):
