@@ -439,7 +439,8 @@ form dictionaries prompted the separate preservation experiment below.
 - `INSTALL.md` covers choosing a platform, first use from Terminal/PowerShell,
   dictionary placement, manual updates, rollback and checksum checks. These builds
   have no Developer ID/notarisation or Windows publisher certificate. The project's
-  own licence remains undecided; packaging dependency notices does not select one.
+  own licence was undecided for this first build; the later MIT choice is recorded
+  below. Packaging dependency notices did not select a project licence.
 - Local macOS tests and vet passed, including the version command without a
   dictionary and ZIP preservation/checksum tests. An extracted Intel package ran
   with the expected version; independent checks verified its ZIP/content hashes,
@@ -461,8 +462,21 @@ form dictionaries prompted the separate preservation experiment below.
   PDF-reader checks or signed-installer compatibility.
 - Development artifact downloads require GitHub sign-in and expire on
   21 October 2026. A stable release, dedicated installers and automatic updates
-  remain future work. Next proposed step: choose the project's licence before
-  preparing a stable public release.
+  remain future work. The proposed licence choice was subsequently made below.
+
+### MIT licence selected (21 September 2026)
+
+- The maintainer explicitly chose the MIT licence. Added the standard text in
+  root `LICENSE`, with copyright attributed to `Dangthrimble`, the existing Git
+  author name, for 2026. README and installation instructions identify the licence.
+- Updated the packager to include `LICENSE` in each ZIP and its content-checksum
+  manifest. Dependency licences and notices remain separate and unchanged.
+- Local packager tests and vet passed. A generated Intel Mac package contains the
+  exact project licence, the revised dependency notice and valid content/archive
+  checksums. This change does not alter PDF processing or the installed executable.
+- The first `dev-1-866c1d767085` artifacts predate this choice; new builds include
+  the licence. A stable release, installers and automatic updates remain future
+  work. Next proposed step: prepare a numbered release for review.
 
 ### Earlier investigation context
 
@@ -516,8 +530,8 @@ Further proposals from the earlier review:
 - Consider GitHub Actions for checks and builds, then tagged GitHub Releases with
   downloadable executables and checksums. Verify current service limits when
   implementing the no-cost workflow.
-- Choose a project licence before presenting the project as open source. Signing,
-  notarisation and an optional download website were deferred considerations.
+- The maintainer chose MIT as the project licence on 21 September 2026. Signing,
+  notarisation and an optional download website remain deferred considerations.
 - GitHub repository: https://github.com/Dangthrimble/fn2fm. Development branch at
   this handover: `improve-cross-platform`.
 - Existing variable/return refactoring is preserved in commit `f2a8734`.
@@ -545,7 +559,7 @@ Further proposals from the earlier review:
   filename, rather than requiring the user to rename it first.
 - Support renaming files with password-protected metadata.
 - Check filename uniqueness against existing files.
-- Prepare a stable release after selecting the project licence. Versioned
+- Prepare a stable release from the tested MIT-licensed source. Versioned
   development packages and native automated checks for all three initial
   platforms are complete (see above).
 - Consider dedicated installers and automatic updates; current packages use

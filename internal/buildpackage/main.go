@@ -87,6 +87,7 @@ func packageBinary(binary, version, out string) error {
 		{executable, binary, 0755},
 		{"INSTALL.md", "INSTALL.md", 0644},
 		{"README.md", "README.md", 0644},
+		{"LICENSE", "LICENSE", 0644},
 		{"names.example.json", "names.json", 0644},
 	} {
 		if err := add(file.name, file.path, file.mode); err != nil {
@@ -122,7 +123,7 @@ func packageBinary(binary, version, out string) error {
 func dependencyLicenses(deps []*debug.Module) ([]entry, error) {
 	var files []entry
 	var index strings.Builder
-	index.WriteString("Third-party software included in this build\n\nThese notices apply to dependencies, not to fn2fm's own code.\nThe project licence for fn2fm has not yet been selected.\n\n")
+	index.WriteString("Third-party software included in this build\n\nfn2fm is licensed under the MIT licence; see LICENSE.\nThe dependencies listed below retain their own licences and notices.\n\n")
 	goRoot, err := exec.Command("go", "env", "GOROOT").Output()
 	if err != nil {
 		return nil, err

@@ -5,7 +5,7 @@
 Download versioned development packages from successful **Build and test** runs
 on the repository's [Actions page](https://github.com/Dangthrimble/fn2fm/actions).
 Packages are provided for macOS Intel, macOS Apple Silicon and Windows x64, with
-an executable, instructions, checksums and dependency notices. They contain
+an executable, instructions, checksums, the MIT licence and dependency notices. They contain
 `names.example.json`; your working `names.json` stays separate.
 
 See [installation and manual-update instructions](INSTALL.md). Use
@@ -210,3 +210,9 @@ In all these examples, the forScore Title will be the same as the filename, with
   - Arrangers:
   - Key:
   - Tags: With Accompaniment
+
+## Licence
+
+fn2fm is licensed under the [MIT licence](LICENSE). Bundled dependencies retain
+their own licences; downloadable packages include `THIRD_PARTY_NOTICES.txt` and
+the corresponding licence files in `THIRD_PARTY_LICENSES/`.

@@ -20,7 +20,7 @@ for 30 days. A later successful run provides a new set of packages. See
 
 Extract the downloaded artifact, then the versioned ZIP inside it. Keep the
 extracted folder together: it contains the executable, this guide, README,
-`VERSION.txt`, checksums, a starter dictionary and dependency licence notices.
+`VERSION.txt`, checksums, a starter dictionary, `LICENSE` and dependency notices.
 
 ## macOS
 
@@ -114,5 +114,5 @@ or incomplete files; they do not provide a publisher signature.
 The current application updates each PDF in place after validation and preserves
 its first `.pdf_original` backup. A fixed output folder, shared dictionaries,
 dedicated installers and automatic updates remain future development options.
-See README for supported filenames and PDF limitations. A project licence for
-fn2fm has not yet been selected; included dependency notices cover those components.
+See README for supported filenames and PDF limitations. fn2fm uses the MIT licence
+in `LICENSE`; dependencies retain their own licences, included with the package.
