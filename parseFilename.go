@@ -174,6 +174,7 @@ func parseKey(md string) (string, error) {
 	)
 
 	keys := map[string]string{
+		"":    "", // No key specified, for example for an atonal score.
 		"Cb":  "keysf:-7, keymi:0",
 		"Abm": "keysf:-7, keymi:1",
 		"Gb":  "keysf:-6, keymi:0",

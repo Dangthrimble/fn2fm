@@ -124,6 +124,9 @@ func TestFN2FMStandaloneCommand(t *testing.T) {
 			if (err != nil) != tc.wantError {
 				t.Fatalf("unexpected exit: %v\n%s", err, output)
 			}
+			if tc.name == "malformed dictionary" && !strings.Contains(string(output), "Unable to load names.json: invalid names.json:") {
+				t.Fatalf("missing malformed dictionary diagnostic: %s", output)
+			}
 			if tc.wantError {
 				if !bytes.Equal(readTestFile(t, path), tc.input) {
 					t.Fatal("failed command changed or renamed original PDF")
@@ -138,6 +141,36 @@ func TestFN2FMStandaloneCommand(t *testing.T) {
 				t.Fatalf("incorrect CLI metadata: %q / %q / %q / %q", ctx.Title, ctx.Author, ctx.Subject, ctx.Keywords)
 			}
 			if !bytes.Equal(readTestFile(t, path+"_original"), tc.input) {
+				t.Fatal("command did not preserve original backup")
+			}
+		})
+	}
+}
+
+func TestFN2FMEmptyKeyCommand(t *testing.T) {
+	for _, tc := range []struct{ suffix, keywords string }{
+		{"[]", ""},
+		{"[]+", "With Accompaniment"},
+		{"[   ]-", "Without Accompaniment"},
+	} {
+		t.Run(tc.suffix, func(t *testing.T) {
+			dir := t.TempDir()
+			name := "Atonal Score ~ JoRu" + tc.suffix + ".pdf"
+			path := filepath.Join(dir, name)
+			source := existingInfoPDF(false)
+			writeTestFile(t, path, source)
+			writeTestFile(t, filepath.Join(dir, "names.json"), []byte(`{"JoRu":"John Rutter"}`))
+			cmd := exec.Command(os.Args[0], "-test.run=^TestFN2FMCLIHelper$", "--", name)
+			cmd.Dir = dir
+			cmd.Env = append(os.Environ(), "FN2FM_TEST_MAIN=1", "PATH="+dir)
+			if output, err := cmd.CombinedOutput(); err != nil {
+				t.Fatalf("command failed: %v\n%s", err, output)
+			}
+			ctx := readTestPDF(t, readTestFile(t, path))
+			if ctx.Title != strings.TrimSuffix(name, ".pdf") || ctx.Author != "John Rutter" || ctx.Keywords != tc.keywords {
+				t.Fatalf("unexpected metadata: title=%q author=%q keywords=%q", ctx.Title, ctx.Author, ctx.Keywords)
+			}
+			if !bytes.Equal(readTestFile(t, path+"_original"), source) {
 				t.Fatal("command did not preserve original backup")
 			}
 		})

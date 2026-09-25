@@ -1,8 +1,29 @@
-# Future development notes
+# Development history and decisions
 
-This file records project goals, confirmed filename requirements, unfinished
-investigations and future work. Backlog order does not imply an agreed priority;
-suggested approaches below are not settled implementation decisions.
+This file records completed work, the reasons for the decisions made, and the
+supporting verification. Dated entries describe the state at that time; later
+entries supersede earlier decisions and proposed next steps. Historical test
+results do not establish the correctness of later changes.
+
+Outstanding work and unresolved questions are in [BACKLOG.md](BACKLOG.md).
+The [README](README.md) describes current behaviour.
+
+## Current decisions
+
+- Use a single tilde (`~`) between score name and metadata. Semicolon filenames
+  are not supported, following the maintainer's working convention.
+- Keep key brackets, but allow their contents to be empty when no key can be
+  specified, including for atonal music. This supersedes the earlier rejection
+  rule on 25 September 2026.
+- Load the editable `names.json` from the current working directory. The checked-in
+  dictionary remains a starter; personal dictionaries are not replaced.
+- Write PDF Info metadata directly with pdfcpu, using incremental updates to
+  preserve original bytes and unrelated metadata. Preserve XMP for compatibility
+  with the legacy workflow; Info/XMP synchronisation remains a separate issue.
+- Preserve the first original backup. Failed PDF writes retain the source;
+  filename/tag validation still has the existing `_rename` behaviour.
+- Provide versioned development packages for macOS Intel, macOS Apple Silicon
+  and Windows x64, with manual updates and the MIT licence.
 
 ## Goals and working approach
 
@@ -18,11 +39,42 @@ suggested approaches below are not settled implementation decisions.
 The maintainer's working executable uses a tilde (`~`) between score name and
 metadata. The maintainer reports its filesystem date as 1 February 2024 at 03:28.
 The earliest available Git commit, `fdba9bc` (23 June 2024), already uses a
-semicolon (`;`), as does the current `parseFilename.go` and README. Available
-Git history does not show a tilde-to-semicolon change or establish why these
-versions differ. A commit date is not the original creation date of its source,
-and a filesystem timestamp alone does not establish a binary's source revision.
-Do not interpret this as an intentional decision to abandon the tilde convention.
+semicolon (`;`), as did `parseFilename.go` and README before reconciliation.
+
+On 25 September 2026, the maintainer recalled that the legacy executable was
+probably built from a modification to the Git source after receiving the 2024
+forScore email. This suggests a semicolon-to-tilde correction in response to
+forScore's restrictions, with the Git source retaining the earlier convention.
+This is the maintainer's recollection, not a verified source/build chronology.
+Available Git history does not establish the exact change or build revision.
+A commit date is not the original creation date of its source, and a filesystem
+timestamp alone does not establish a binary's source revision or disprove this
+sequence. There is no established tilde-to-semicolon reversal.
+
+### forScore character restrictions (correspondence from 2024, supplied 25 September 2026)
+
+- Source: the maintainer-supplied email `Re_ forScore Pro ticket #9110202429965819.eml`,
+  specifically the forScore Customer Support reply dated 6 March 2024, relaying
+  the developer's explanation. The initial report on 29 January described a
+  semicolon disappearing from a PDF metadata title when fetched into forScore
+  14.1.3 on Mac Catalyst 17.2.
+- The reply states that titles cannot begin with a period or contain `|`, `/`,
+  `\`, `;` or system-defined control characters (Unicode categories `Cc` and
+  `Cf`). It notes that Apple's OS could change the control-character definition.
+  It also states that leading/trailing whitespace and newlines are stripped
+  from filenames.
+- This supplies the forScore-specific justification for excluding semicolons:
+  fn2fm writes its full filename stem into PDF Title, so an excluded separator
+  would not survive fetching unchanged. The tilde convention avoids that issue.
+  Pipe and slash exclusions overlap with the project's cloud-storage policy.
+- The email does not say that all periods or all non-ASCII characters are
+  forbidden. Those broader exclusions belong to fn2fm's filename policy. It also
+  does not establish the source revision of the legacy executable. The
+  maintainer's subsequent recollection above supplies a likely explanation for
+  the two source variants without establishing their exact chronology.
+- Updated the README and narrowed the outstanding provenance question in the
+  backlog. This was a documentation clarification; parser behaviour was unchanged.
+  The correspondence is historical evidence, not a fresh compatibility test.
 
 ### Tilde-only reconciliation (18 September 2026)
 
@@ -33,8 +85,8 @@ Do not interpret this as an intentional decision to abandon the tilde convention
 - Updated the existing tests and README separator examples. Added regression tests
   for semicolon rejection, repeated tildes and all seven real filenames, using a
   small fixture from the working dictionary. The module structure and earlier
-  refactoring are retained. Broader named-key behaviour is unchanged. Empty keys remain rejected, as
-  explicitly confirmed by the maintainer below.
+  refactoring are retained. Broader named-key behaviour was unchanged. Empty keys remained rejected at
+  this stage; that decision was superseded on 25 September 2026 (see below).
 - The maintainer identified the working dictionary as
   `/Users/jonathan/Documents/Choir/Cambrensis/New Songs/names.json`.
   Its 73 entries include all entries in the two source dictionaries with identical
@@ -106,13 +158,13 @@ Use representative real filenames as regression cases, with suitable name-map
 fixtures, when reconciling the parser, tests and README. Locate and preserve the
 working executable and its matching name dictionary; if possible, identify its
 source/build provenance. Use disposable PDF copies for behaviour comparisons.
-The maintainer explicitly chose to reject empty brackets `[]`, including brackets
+At this stage, the maintainer explicitly chose to reject empty brackets `[]`, including brackets
 containing only spaces. Specify the actual key where known; otherwise use an
 accidental count (`0` or `1`–`7` followed by `#` or `b`) as a fallback. Counts
 produce no forScore key metadata but retain distinguishing information in the
 filename. They do not distinguish all possible keys (for example, relative major
-and minor keys share an accidental count). The README now reflects this decision;
-the parser already rejected empty keys, and regression tests cover this behaviour.
+and minor keys share an accidental count). The README and regression tests were updated to reflect that decision.
+The decision was superseded on 25 September 2026 to allow scores without a key.
 Semicolon backward compatibility was also explicitly rejected (see above).
 
 ## Dictionary requirements (19 September 2026)
@@ -360,9 +412,9 @@ form dictionaries prompted the separate preservation experiment below.
   binaries are in ignored `dist/standalone-integration/`. Hashes confirmed the music
   originals/backups, working dictionary and installed legacy executable unchanged.
   No commit, push or deployment was performed.
-- Next proposed step: run the Windows build against disposable PDFs on Windows
-  to verify replacement, backups and metadata there. Cross-compilation alone does
-  not establish Windows runtime compatibility.
+- Windows runtime verification was the next step at this point, since
+  cross-compilation alone did not establish compatibility. The successful hosted
+  run on 21 September is recorded below.
 
 ### Windows workflow prepared locally (20 September 2026)
 
@@ -389,18 +441,18 @@ form dictionaries prompted the separate preservation experiment below.
   steps have executed yet, so no Windows runtime success is claimed.
 - Application code, personal PDFs/dictionary and installed executable were not
   changed by this step. No commit, push, release or hosted workflow run was made.
-- Next proposed step: commit and push the development app, tests, generated
-  fixtures and workflow to trigger the Windows job, then inspect its result.
-  Keep baseline snapshots, personal score outputs and local binaries out of the
-  commit; those are investigation artifacts, not required workflow inputs.
+- Committing and pushing the app, tests, generated fixtures and workflow was the
+  next step at this point; the result is recorded below. Baseline snapshots,
+  personal score outputs and local binaries were excluded because they are
+  investigation artifacts, not required workflow inputs.
 
 ### First successful hosted Windows run (21 September 2026)
 
 - With the maintainer's approval, committed and pushed the standalone app, tests,
   generated fixtures, workflow and notes as `07d4700` on `improve-cross-platform`.
   This includes the newly requested persistent output-location configuration
-  (including Box/Dropbox) and shared `names.json` options in the backlog below;
-  those options remain future work, not implemented behaviour.
+  (including Box/Dropbox) and shared `names.json` options in the backlog;
+  those options remain future work in [BACKLOG.md](BACKLOG.md), not implemented behaviour.
 - Added `.gitattributes` to treat PDFs as binary. This prevents Windows checkout
   from converting fixture line endings and invalidating PDF byte offsets.
   Personal PDFs, working dictionary, installed executable, baseline snapshots and
@@ -415,8 +467,8 @@ form dictionaries prompted the separate preservation experiment below.
   does not establish PDF-reader display behaviour, other Windows versions or
   universal PDF compatibility. The local music files, backups, dictionary and
   installed legacy executable were rechecked by hash and remain unchanged.
-- Next proposed step: prepare downloadable development builds for macOS Intel,
-  macOS Apple Silicon and Windows x64.
+- Downloadable builds for macOS Intel, macOS Apple Silicon and Windows x64 were
+  prepared next, as recorded below.
 
 ### Versioned development packages (21 September 2026)
 
@@ -481,128 +533,59 @@ form dictionaries prompted the separate preservation experiment below.
 ### Earlier investigation context
 
 The setup conversation proposed comparing ExifTool with pdfcpu before committing
-to removing ExifTool. pdfcpu is a candidate, not an adopted dependency. Compare
-Title, Author, Subject and Keywords, relevant PDF/XMP metadata, and actual forScore
-import behaviour; matching field names alone does not prove equivalent results.
+to removing ExifTool. At that point pdfcpu was a candidate, not an adopted dependency.
+This section preserves the initial investigation context; the integration and
+subsequent validation recorded above supersede its proposed next steps. The
+comparison needed to cover Title, Author, Subject and Keywords, relevant PDF/XMP
+metadata, and actual forScore import behaviour, because matching field names
+alone would not prove equivalent results.
 
 Two identical disposable copies were prepared in `/tmp/fn2fm-exiftool` and
 `/tmp/fn2fm-pdfcpu`, both named `Test Score ~ JoRu[C]+.pdf`. The source PDF already
 contained metadata; it was not blank. The conversation ended before any result
 from processing the ExifTool copy or performing the pdfcpu comparison was shown.
-Temporary files may need recreating. The previously suggested `go run .` command
-would use the semicolon-based checked-in parser, so resolve the baseline mismatch
-first; it may reject and rename the tilde-named test copy.
+At that point, the suggested `go run .` command would have used the
+semicolon-based parser and could have rejected and renamed the tilde-named test
+copy. This was why the baseline mismatch needed resolving first.
 
-ExifTool 13.59 at `/opt/local/bin/exiftool` was reported during setup. If replacement
-does not meet compatibility requirements, retain ExifTool and investigate portable
-discovery or bundling. Bundling/extracting Windows ExifTool was suggested as an
-option; packaging, licensing and update handling must be checked before adoption.
+ExifTool 13.59 at `/opt/local/bin/exiftool` was reported during setup. Retaining
+ExifTool and investigating portable discovery or bundling was a fallback if the
+replacement failed compatibility checks. Windows bundling would have required
+packaging, licensing and update review; it was not adopted.
 
-## Additional issues identified during setup
+## Earlier repository setup
 
-These findings were also checked against the local source on 18 September 2026:
+- Preserved variable/return refactoring in commit `f2a8734`.
+- Completed README renaming, ignore-rule cleanup, removal of stray gofmt
+  documentation and obsolete local files. These are completed housekeeping,
+  not outstanding backlog items.
+- The setup conversation recorded passing tests and vet and cross-compilation
+  for the three initial targets. Later native runtime checks are recorded above;
+  cross-compilation alone was not treated as proof of runtime compatibility.
+- GitHub authentication and a push subsequently succeeded. Earlier plugin
+  connection trouble added no product requirements and is not a continuing blocker.
+- Repository: https://github.com/Dangthrimble/fn2fm. The recorded development
+  branch at the earlier handover was `improve-cross-platform`.
 
-- The repeated key-length condition and discarded `json.Unmarshal` error were
-  fixed during standalone writer integration above.
-- Preserve the supplied key text for errors: a failed map lookup currently reports
-  the empty result rather than the invalid input.
-- Handle errors from filename/tag `os.Rename` calls and review their `_rename`
-  behaviour. Other metadata parsing errors still skip the file; the standalone
-  writer now retains filenames on PDF update errors (see integration above).
+## Empty keys and notes separation (25 September 2026)
 
-Further proposals from the earlier review:
-
-- An explicit dictionary-path option was an earlier suggestion, not an agreed
-  change. Current-working-directory lookup is intentional (see requirements above).
-- Reconcile README name-code examples with the supplied dictionary; consider an
-  example dictionary or overridable defaults.
-- Add command-line help/options and integration tests. Extend existing tests for
-  changed behaviour rather than replacing the current suite wholesale.
-- Make wildcard handling consistent across macOS and Windows shells.
-- Consider named Go string constants for reusable regex fragments if regex-based
-  parsing improves clarity. The regex conversation explored this technique; it
-  did not decide to replace the existing parser or define the full grammar.
-
-## Distribution proposals and completed setup
-
-- Proposed initial builds: macOS Intel, macOS Apple Silicon and Windows x64.
-  Windows ARM64 was a possible later addition, not an agreed initial target.
-- Consider GitHub Actions for checks and builds, then tagged GitHub Releases with
-  downloadable executables and checksums. Verify current service limits when
-  implementing the no-cost workflow.
-- The maintainer chose MIT as the project licence on 21 September 2026. Signing,
-  notarisation and an optional download website remain deferred considerations.
-- GitHub repository: https://github.com/Dangthrimble/fn2fm. Development branch at
-  this handover: `improve-cross-platform`.
-- Existing variable/return refactoring is preserved in commit `f2a8734`.
-  README renaming, ignore-rule cleanup, removal of stray gofmt documentation and
-  obsolete local files were completed during setup; do not repeat them as backlog.
-- The setup conversation recorded passing tests and vet checks and reported
-  cross-compilation for the three initial targets. These are historical results,
-  not verification of future changes or runtime behaviour on each platform.
-- GitHub plugin troubleshooting added no product requirements. Later setup
-  recorded successful GitHub authentication and a push, so the earlier connection
-  failure should not be treated as a continuing blocker.
-
-## Existing review items
-
-- Review use of `:=` to avoid shadowing.
-- Review use of named return parameters and blank returns.
-- Support use of glob to pass in wildcards.
-
-## Additional backlog
-
-- Support multiple versions of a song.
-- Support suites of music (e.g. oratorios, symphonies, operas and musicals) and
-  their individual movements.
-- Let the user select a file and supply the details from which to create its
-  filename, rather than requiring the user to rename it first.
-- Support renaming files with password-protected metadata.
-- Check filename uniqueness against existing files.
-- Prepare a stable release from the tested MIT-licensed source. Versioned
-  development packages and native automated checks for all three initial
-  platforms are complete (see above).
-- Consider dedicated installers and automatic updates; current packages use
-  manual installation and manual updates as documented in `INSTALL.md`.
-- Add a configuration file for genre or arranger handling; define the supported
-  choices and metadata mapping before implementation.
-- Optionally retain configuration between application invocations, including a
-  predefined output location so generated files can always be written to the same
-  destination. Allow that destination to be on Box or Dropbox. Decide whether to
-  use a locally synchronised folder or direct cloud access during design; neither
-  approach is yet selected or implemented.
-- Allow multiple users of the application to share `names.json`. Define how the
-  shared dictionary is located and how updates and concurrent edits are handled;
-  the current per-working-directory dictionary behaviour remains unchanged.
-- Refactor the code toward more idiomatic Go.
-- Consider additional platforms beyond the three supported development builds.
-- Investigate forScore PDF-metadata parsing compatibility, particularly shared
-  setlists when users have different metadata-parsing settings.
-
-### forScore metadata parsing and shared setlists
-
-forScore calls this operation **Fetching PDF metadata**. Its
-[official instructions](https://forscore.co/kb/fetching-pdf-metadata/) describe
-manual fetching and automatic fetching for newly added files.
-
-The maintainer supplied these steps for their installed version:
-- Automatic: Settings > Advanced options > Metadata > Automatic fetching for new
-  files. This is currently turned off, as reported by the maintainer.
-- Per file: open the file's properties, tap the ellipsis, select **Fetch…**, then
-  tap the tick to save.
-
-Use per-file fetching for the comparison; enabling automatic fetching globally
-is unnecessary. These instructions do not establish a successful comparison:
-the actual fetched values still need to be checked in forScore.
-
-forScore can optionally parse embedded PDF metadata and use it as visible metadata
-within the app. The reported corner case is that doing so sometimes changes how a
-score is identified within forScore. A setlist containing that score may then fail
-to share successfully with someone who has the same PDFs but does not parse their
-metadata.
-
-Investigate which embedded metadata fields affect score identification and setlist
-references, and whether fn2fm can generate metadata that preserves compatibility
-with parsing either enabled or disabled. This is a forScore interoperability
-investigation, rather than a general filename-normalisation task; the cause and
-solution have not yet been established.
+- The maintainer changed the empty-key requirement because some scores, such as
+  atonal music, have no key that can be specified. `[]` and space-only brackets
+  now produce no key metadata. The brackets themselves remain mandatory;
+  named keys and accidental counts retain their existing meanings.
+- Updated the parser, README and previous rejection tests. Added command-level
+  regression cases for empty keys with and without accompaniment and for
+  space-only brackets. These check written metadata and original-backup contents
+  using disposable PDFs. They do not establish new manual forScore results.
+- Keyword joining and malformed-JSON handling were already fixed during standalone
+  writer integration. The JSON command test now also checks the error diagnostic,
+  so a nonzero exit alone does not count as a clear explanation of the failure.
+- Split `future development notes.md` into this history and [BACKLOG.md](BACKLOG.md).
+  This separates unfinished work from completed investigations while preserving
+  rationale, evidence locations, failed experiments and the limits of verification.
+  The earlier rejection of empty keys is retained above as a superseded decision.
+- Validation: the focused regression tests failed before the parser change,
+  confirming the old rejection behaviour. After the change,
+  `go test -count=1 ./...`, `go vet ./...` and `git diff --check` passed locally
+  on macOS Intel with Go 1.25.0. No new hosted platform run or manual PDF-reader
+  check was performed for this change.

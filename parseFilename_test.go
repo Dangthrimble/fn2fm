@@ -227,8 +227,8 @@ func TestParseKey(t *testing.T) {
 	for _, metadata := range []string{"CrCo[]+", "CrCo[   ]+"} {
 		t.Run("empty key "+metadata, func(t *testing.T) {
 			got, err := parseKey(metadata)
-			if got != "" || err == nil {
-				t.Fatalf("got (%q, %v), want empty-key rejection", got, err)
+			if got != "" || err != nil {
+				t.Fatalf("got (%q, %v), want no key metadata and no error", got, err)
 			}
 		})
 	}

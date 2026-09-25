@@ -1,5 +1,8 @@
 # fn2fm - Filename to forScore Metadata
 
+See the [backlog](BACKLOG.md) for outstanding work and the
+[development history](DEVELOPMENT_HISTORY.md) for completed work and decisions.
+
 ## Downloads and updates
 
 Download versioned development packages from successful **Build and test** runs
@@ -110,6 +113,32 @@ By default, scores and bookmarks in forScore 14.0 can be tagged with the followi
 
 ## Supported Character Set
 
+### forScore title restrictions
+
+In a support reply dated 6 March 2024 (ticket #9110202429965819), forScore
+Customer Support relayed the developer's explanation:
+
+- Titles cannot start with a period (`.`).
+- Titles cannot contain a pipe (`|`), forward slash (`/`), backslash (`\`) or
+  semicolon (`;`).
+- Titles cannot contain system-defined control characters, identified in the
+  reply as Unicode categories `Cc` and `Cf`. The reply noted that this definition
+  could change with an Apple OS update.
+- forScore strips whitespace and newlines from the beginning and end of filenames.
+
+The original report concerned a semicolon disappearing from the PDF metadata
+title when fetched into forScore. Because fn2fm writes the full filename stem
+as the PDF Title, it excludes semicolons throughout that stem and uses `~` as
+the metadata separator. This restriction therefore has a forScore compatibility
+reason in addition to the separate cloud-storage considerations below.
+
+These are the restrictions reported in the 2024 correspondence, not a new test
+of current forScore versions. fn2fm's printable-ASCII policy is stricter: it also
+excludes non-ASCII characters and periods anywhere in the filename stem, rather
+than only a leading period.
+
+### Cloud storage and project filename policy
+
 An additional possible constraint on PDF filenames (e.g. for choirs) is that, where forScore files are shared via cloud storage, the supported character set has to comply with that of the cloud storage used, as well as that of the device(s) on which the PDF files are prepared for sharing (and on which fn2fm is run). Two popular cloud storage solutions are [Dropbox](https://www.dropbox.com) and [Box](https://www.box.com/) which both provide guidance on filenaming:
 - [Naming Dropbox files and folders](https://help.dropbox.com/organize/file-names)
 - [Troubleshooting Uploads to Box](https://support.box.com/hc/en-us/articles/360044196773-Troubleshooting-Uploads-to-Box)
@@ -154,11 +183,11 @@ The score metadata is formatted as follows and, apart from the limitation of no 
 
 <composer(s)\> and <arranger(s)\> are entered in abbreviated form, with the abbreviation being checked against a list of abbreviations and expanded forms maintained in `names.json` (e.g. "JoRu" for "John Rutter"; "CtEcMr" for "Chris Tomlin, Ed Cash, Matt Redman"). If there are no composers, no text is required between the tilde ("~") and the underscore ("_"). if there are no arrangers, the underscore ("_") is not required and no text is required before the open square bracket ("\["). The choice of abbreviations is up to the individual.
 
-<initialKeySignature\> is required. Specify the actual major or minor key where known, using `#` for sharp, `b` for flat and `m` for minor (e.g. `[C]`, `[F#]` or `[F#m]`). This allows fn2fm to write the forScore "Key" metadata.
+The key brackets are required, but <initialKeySignature\> may be empty. Specify the actual major or minor key where known, using `#` for sharp, `b` for flat and `m` for minor (e.g. `[C]`, `[F#]` or `[F#m]`). This allows fn2fm to write the forScore "Key" metadata.
 
 If the actual key is not known, use the number of accidentals as a fallback: `[0]` for no sharps or flats, `[1#]` through `[7#]` for sharps, or `[1b]` through `[7b]` for flats. These counts produce no forScore key metadata and do not imply major or minor. They retain key-signature information in the filename, helping distinguish copies of the same song with different key signatures.
 
-Empty brackets (`[]`) and brackets containing only spaces are rejected. Always supply either the actual key or the accidental count. Different keys can share the same accidental count, so use the actual key where known.
+Use empty brackets (`[]`) when no key can be specified, for example for an atonal score: `Atonal Score ~ JoRu[]+.pdf`. Brackets containing only spaces are also accepted. These produce no forScore key metadata; any accompaniment tag is still included. Different keys can share the same accidental count, so use the actual key where known.
 
 <accompanimentIndicator\> can be a plus ("+") for a tag that states "With Accompaniment", a hyphen/minus ("-") for a tag that states "Without Accompaniment", or left blank for no accompaniment tag.
 
