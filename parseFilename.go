@@ -10,7 +10,7 @@ import (
 
 const (
 	validExt   = ".pdf"
-	mdPrefix   = ";"
+	mdPrefix   = "~"
 	arrPrefix  = "_"
 	keyPrefix  = "["
 	keySuffix  = "]"
@@ -19,9 +19,9 @@ const (
 )
 
 const (
-	minPrintASCII = '\u0020'       // Minimum printable ASCII value
-	maxPrintASCII = '\u007E'       // Maximum printable ASCII value
-	charToAvoid   = "\"*./:<>?\\|" // Characters to avoid according to cloud storage
+	minPrintASCII = '\u0020'        // Minimum printable ASCII value
+	maxPrintASCII = '\u007E'        // Maximum printable ASCII value
+	charToAvoid   = "\"*./:;<>?\\|" // Characters to avoid according to cloud storage
 )
 
 func validateFilenameAndExtension(fnExt string) (string, error) {
@@ -162,7 +162,7 @@ func findComposersOrArrangers(key string, ca map[string]string) (string, error) 
 		return "", errors.New(fmt.Sprintf("composers or arrangers not found"))
 	}
 
-	return names, nil
+	return strings.TrimSpace(names), nil
 }
 
 func parseKey(md string) (string, error) {
@@ -174,6 +174,7 @@ func parseKey(md string) (string, error) {
 	)
 
 	keys := map[string]string{
+		"":    "", // No key specified, for example for an atonal score.
 		"Cb":  "keysf:-7, keymi:0",
 		"Abm": "keysf:-7, keymi:1",
 		"Gb":  "keysf:-6, keymi:0",
