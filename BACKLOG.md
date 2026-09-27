@@ -105,8 +105,9 @@ is a forScore interoperability issue, not a general filename-normalisation task.
 - Consider dedicated installers and automatic updates. Current packages use
   manual installation and updates as described in [INSTALL.md](INSTALL.md).
 - Consider signing, macOS notarisation and an optional download website.
-- Consider additional platforms, including Windows ARM64. These were not agreed
-  initial targets; macOS Intel, macOS Apple Silicon and Windows x64 are established.
+- Consider platforms beyond the six configured targets: macOS Intel/Apple Silicon,
+  Windows x64/ARM64 and Linux x64/ARM64. The Windows ARM64 and Linux jobs were added
+  on 27 September 2026; their first hosted results remain to be checked.
 - Verify service limits when extending the no-cost distribution workflow.
 - Manual Windows PDF-reader display checks remain distinct from the successful
   hosted Windows runtime tests.

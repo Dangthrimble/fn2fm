@@ -23,13 +23,34 @@ jobs:
         include:
           - platform: macos-intel
             runner: macos-15-intel
+            goos: darwin
+            goarch: amd64
             binary: fn2fm
           - platform: macos-apple-silicon
             runner: macos-15
+            goos: darwin
+            goarch: arm64
             binary: fn2fm
           - platform: windows-x64
             runner: windows-2025
+            goos: windows
+            goarch: amd64
             binary: fn2fm.exe
+          - platform: windows-arm64
+            runner: windows-11-arm
+            goos: windows
+            goarch: arm64
+            binary: fn2fm.exe
+          - platform: linux-x64
+            runner: ubuntu-24.04
+            goos: linux
+            goarch: amd64
+            binary: fn2fm
+          - platform: linux-arm64
+            runner: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+            binary: fn2fm
     defaults:
       run:
         shell: pwsh
@@ -37,6 +58,8 @@ jobs:
       CGO_ENABLED: '0'
       GOWORK: 'off'
       GOTOOLCHAIN: local
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
 
     steps:
       - name: Check out source
@@ -49,6 +72,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache-dependency-path: go.sum
+
+      - name: Verify native build target
+        run: |
+          if ((go env GOHOSTOS) -ne $env:GOOS -or (go env GOHOSTARCH) -ne $env:GOARCH) {
+            throw "Go host does not match the requested native target $env:GOOS/$env:GOARCH"
+          }
 
       - name: Run tests
         run: go test -count=1 -v ./...

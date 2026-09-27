@@ -11,6 +11,12 @@ run and download the package for your computer from **Artifacts**:
 - `macos-intel`: a Mac with an Intel processor.
 - `macos-apple-silicon`: a Mac with an Apple M-series chip.
 - `windows-x64`: an Intel/AMD 64-bit Windows computer.
+- `windows-arm64`: an ARM64 Windows computer.
+- `linux-x64`: an Intel/AMD 64-bit Linux computer.
+- `linux-arm64`: an ARM64 Linux computer running a 64-bit OS.
+
+Choose an artifact from a successful run that includes your platform; older runs
+may only contain the three original macOS and Windows x64 packages.
 
 Each package is named `fn2fm-dev-<run>-<commit>-<platform>.zip`. The version identifies
 the build run and source commit. These are development builds, not numbered stable
@@ -73,6 +79,28 @@ cd "$HOME/Documents/Score Test Copies"
 These development executables have no Windows publisher signature. Windows or a
 managed computer's policy may require approval to run them.
 
+## Linux
+
+1. Extract the versioned ZIP into a folder you own, for example
+   `~/.local/opt/fn2fm/<version-folder>`. Keep the extracted files together.
+2. Open a terminal and check the executable's version:
+
+   ```sh
+   "$HOME/.local/opt/fn2fm/<version-folder>/fn2fm" --version
+   ```
+
+3. Check that the version matches `VERSION.txt`. If extraction removed execute
+   permission, run `chmod u+x` followed by the quoted executable path.
+4. Change to the folder containing your score copies and `names.json`, then run:
+
+   ```sh
+   cd "$HOME/Documents/Score Test Copies"
+   "$HOME/.local/opt/fn2fm/<version-folder>/fn2fm" "Test Score ~ JoRu[C]+.pdf"
+   ```
+
+Linux builds have CGO disabled and do not need Go or ExifTool installed. The CI
+jobs use Ubuntu 24.04; they do not establish compatibility with every distribution.
+
 ## Keep your dictionary separate
 
 fn2fm reads `names.json` from the folder where you run the command, not from the
@@ -91,7 +119,7 @@ versioned ZIP. Compare it with the checksum you calculate before extracting:
 shasum -a 256 fn2fm-dev-<run>-<commit>-macos-intel.zip
 ```
 
-In PowerShell, use:
+On Linux, use `sha256sum` with the downloaded ZIP filename. In PowerShell, use:
 
 ```powershell
 Get-FileHash -Algorithm SHA256 -LiteralPath 'fn2fm-dev-<run>-<commit>-windows-x64.zip'

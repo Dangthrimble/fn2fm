@@ -7,7 +7,8 @@ See the [backlog](BACKLOG.md) for outstanding work and the
 
 Download versioned development packages from successful **Build and test** runs
 on the repository's [Actions page](https://github.com/Dangthrimble/fn2fm/actions).
-Packages are provided for macOS Intel, macOS Apple Silicon and Windows x64, with
+The build workflow produces packages for macOS Intel and Apple Silicon,
+Windows x64 and ARM64, and Linux x64 and ARM64, with
 an executable, instructions, checksums, the MIT licence and dependency notices. They contain
 `names.example.json`; your working `names.json` stays separate.
 
@@ -58,8 +59,9 @@ Run `go test ./...` and `go vet ./...` from the repository root. Tests use gener
 PDF fixtures and temporary folders; no personal score collection is required.
 
 The [build workflow](.github/workflows/build.yml) runs on pushes and pull requests
-on both macOS architectures and Windows x64. It builds and tests each executable
-with external programs unavailable, then creates a verified package. These checks
+on both macOS architectures, Windows x64/ARM64 and Linux x64/ARM64. Each job checks
+that Go runs natively on the intended OS and architecture, tests the built
+executable with external programs unavailable, and creates a verified package. These checks
 cover metadata, paths with spaces, repeated updates, backups, rejected PDFs and
 replacement failure while a Windows process holds the PDF open.
 

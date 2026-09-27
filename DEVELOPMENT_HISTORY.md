@@ -22,8 +22,10 @@ The [README](README.md) describes current behaviour.
   with the legacy workflow; Info/XMP synchronisation remains a separate issue.
 - Preserve the first original backup. Failed PDF writes retain the source;
   filename/tag validation still has the existing `_rename` behaviour.
-- Provide versioned development packages for macOS Intel, macOS Apple Silicon
-  and Windows x64, with manual updates and the MIT licence.
+- Configure versioned development packages for macOS Intel/Apple Silicon,
+  Windows x64/ARM64 and Linux x64/ARM64, with manual updates and the MIT licence.
+  Windows ARM64 and Linux coverage was added on 27 September 2026; hosted
+  verification of the expanded matrix remains outstanding.
 
 ## Goals and working approach
 
@@ -589,3 +591,40 @@ packaging, licensing and update review; it was not adopted.
   `go test -count=1 ./...`, `go vet ./...` and `git diff --check` passed locally
   on macOS Intel with Go 1.25.0. No new hosted platform run or manual PDF-reader
   check was performed for this change.
+
+## Six-platform build coverage (27 September 2026)
+
+- Expanded `.github/workflows/build.yml` to macOS Intel/Apple Silicon, Windows
+  x64/ARM64 and Linux x64/ARM64. The added native runners are `windows-11-arm`,
+  `ubuntu-24.04` and `ubuntu-24.04-arm`, using labels confirmed against
+  [GitHub's runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+  Native jobs allow the existing executable tests to check actual runtime
+  behaviour, including Windows file replacement, rather than only compilation.
+- Each matrix entry declares its Go OS and architecture. A host check fails the
+  job if the installed Go toolchain is not native to that target. All six jobs
+  run the tests and vet, build with CGO disabled, test the built executable,
+  and create a verified package before the existing artifact-upload step.
+- Extended the packager's accepted platform mappings so Windows ARM64 and both
+  Linux builds can produce their own versioned ZIPs, checksums and licence
+  notices. The packager still checks the executable's reported version and target.
+- Updated package selection and added Linux installation instructions. Moved
+  Windows ARM64 and Linux out of the list of proposed platforms; their first
+  hosted results remain a follow-up item.
+- Local verification passed with Go 1.25.0: `go test -count=1 ./...`,
+  `go vet ./...`, and cross-compilation of the app and both test binaries for
+  all six OS/architecture pairs. Embedded build information confirmed each
+  target and `CGO_ENABLED=0`. The verification environment explicitly selected
+  the matching Go toolchain and GOROOT after an inherited Go 1.24 path caused
+  the first cross-build attempts to fail.
+- `actionlint` v1.7.12 passed. Additional checks confirmed six unique matrix
+  entries, native runner labels, package mappings, executable names and install
+  labels. Documentation links and `git diff --check` also passed.
+- The built macOS Intel executable passed its disposable-PDF integration tests;
+  the Windows-specific sharing test was correctly skipped on macOS. A native
+  ZIP was generated and independently checked: archive and content checksums,
+  all 23 entries, executable permission, example-only dictionary, project licence
+  and the extracted executable's version. Verification artifacts are temporary,
+  outside the repository.
+- These results establish compilation for all targets and native execution on
+  macOS Intel. No push or hosted run was performed for this change, so runtime
+  and packaging results for the expanded hosted matrix are not yet claimed.
