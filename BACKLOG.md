@@ -100,14 +100,14 @@ is a forScore interoperability issue, not a general filename-normalisation task.
 
 - Prepare a numbered stable release from the tested MIT-licensed source.
   Versioned development packages, checksums and native automated checks for the
-  three initial platforms are complete. Use tagged GitHub Releases for durable
+  six configured platforms are complete. Use tagged GitHub Releases for durable
   downloads; current development artifacts require sign-in and expire.
 - Consider dedicated installers and automatic updates. Current packages use
   manual installation and updates as described in [INSTALL.md](INSTALL.md).
 - Consider signing, macOS notarisation and an optional download website.
 - Consider platforms beyond the six configured targets: macOS Intel/Apple Silicon,
-  Windows x64/ARM64 and Linux x64/ARM64. The Windows ARM64 and Linux jobs were added
-  on 27 September 2026; their first hosted results remain to be checked.
+  Windows x64/ARM64 and Linux x64/ARM64. All six passed hosted runtime and packaging
+  verification on 27 September 2026; see the development history for the run.
 - Verify service limits when extending the no-cost distribution workflow.
 - Manual Windows PDF-reader display checks remain distinct from the successful
   hosted Windows runtime tests.

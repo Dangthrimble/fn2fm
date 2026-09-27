@@ -94,6 +94,8 @@ func packageBinary(binary, version, out string) error {
 		{executable, binary, 0755},
 		{"INSTALL.md", "INSTALL.md", 0644},
 		{"README.md", "README.md", 0644},
+		{"BACKLOG.md", "BACKLOG.md", 0644},
+		{"DEVELOPMENT_HISTORY.md", "DEVELOPMENT_HISTORY.md", 0644},
 		{"LICENSE", "LICENSE", 0644},
 		{"names.example.json", "names.json", 0644},
 	} {

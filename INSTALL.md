@@ -26,6 +26,7 @@ for 30 days. A later successful run provides a new set of packages. See
 
 Extract the downloaded artifact, then the versioned ZIP inside it. Keep the
 extracted folder together: it contains the executable, this guide, README,
+`BACKLOG.md`, `DEVELOPMENT_HISTORY.md`,
 `VERSION.txt`, checksums, a starter dictionary, `LICENSE` and dependency notices.
 
 ## macOS

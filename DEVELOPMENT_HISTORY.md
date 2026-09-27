@@ -24,8 +24,8 @@ The [README](README.md) describes current behaviour.
   filename/tag validation still has the existing `_rename` behaviour.
 - Configure versioned development packages for macOS Intel/Apple Silicon,
   Windows x64/ARM64 and Linux x64/ARM64, with manual updates and the MIT licence.
-  Windows ARM64 and Linux coverage was added on 27 September 2026; hosted
-  verification of the expanded matrix remains outstanding.
+  All six targets passed hosted runtime and packaging verification on
+  27 September 2026 (see the hosted verification entry below).
 
 ## Goals and working approach
 
@@ -608,8 +608,8 @@ packaging, licensing and update review; it was not adopted.
   Linux builds can produce their own versioned ZIPs, checksums and licence
   notices. The packager still checks the executable's reported version and target.
 - Updated package selection and added Linux installation instructions. Moved
-  Windows ARM64 and Linux out of the list of proposed platforms; their first
-  hosted results remain a follow-up item.
+  Windows ARM64 and Linux out of the list of proposed platforms. Their subsequent
+  hosted results are recorded below.
 - Local verification passed with Go 1.25.0: `go test -count=1 ./...`,
   `go vet ./...`, and cross-compilation of the app and both test binaries for
   all six OS/architecture pairs. Embedded build information confirmed each
@@ -625,6 +625,27 @@ packaging, licensing and update review; it was not adopted.
   all 23 entries, executable permission, example-only dictionary, project licence
   and the extracted executable's version. Verification artifacts are temporary,
   outside the repository.
-- These results establish compilation for all targets and native execution on
-  macOS Intel. No push or hosted run was performed for this change, so runtime
-  and packaging results for the expanded hosted matrix are not yet claimed.
+- These local results established compilation for all targets and native
+  execution on macOS Intel. Hosted verification followed as recorded below.
+
+## Successful six-platform hosted verification (27 September 2026)
+
+- With the maintainer's approval, pushed commit `604ad4603e4c47eb21cfe5449a00d731b4db0312`
+  on `improve-cross-platform`. GitHub Actions
+  [run 36320976042](https://github.com/Dangthrimble/fn2fm/actions/runs/36320976042)
+  completed successfully for macOS Intel/Apple Silicon, Windows x64/ARM64 and
+  Linux x64/ARM64, using native Go 1.25.0 toolchains on all six runners.
+- Every job passed the native-target check, tests, vet, executable build,
+  disposable-PDF executable tests, packaging and artifact upload. Logs confirmed
+  that the Windows open-file/replacement/retry test ran and passed on both
+  Windows architectures; it was correctly skipped on macOS and Linux.
+- All six development packages were uploaded as version `dev-3-604ad4603e4c`.
+  These results establish native automated execution and packaging, not new
+  manual forScore or desktop PDF-reader compatibility checks. The downloaded
+  artifacts were not independently rechecked locally during this hosted run.
+- Updated the current status and backlog to reflect completed verification.
+  At the maintainer's request, retained relative README links and included
+  `BACKLOG.md` and `DEVELOPMENT_HISTORY.md` in development ZIPs. The linked
+  documents now travel with the README and remain usable offline, without
+  depending on a GitHub branch. Both documents are covered by the package's
+  existing content checksums and byte-for-byte archive verification.
