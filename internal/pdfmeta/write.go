@@ -1,4 +1,4 @@
-package main
+package pdfmeta
 
 import (
 	"bytes"
@@ -14,15 +14,15 @@ import (
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 )
 
-type pdfMetadata struct {
+type Metadata struct {
 	Title, Author, Subject, Keywords string
 }
 
-func (m pdfMetadata) fields() map[string]string {
+func (m Metadata) Fields() map[string]string {
 	return map[string]string{"Title": m.Title, "Author": m.Author, "Subject": m.Subject, "Keywords": m.Keywords}
 }
 
-func metadataKeywords(key, accompaniment string) string {
+func Keywords(key, accompaniment string) string {
 	if key != "" && accompaniment != "" {
 		return key + ", " + accompaniment
 	}
@@ -31,7 +31,7 @@ func metadataKeywords(key, accompaniment string) string {
 
 var disablePDFConfig sync.Once
 
-func pdfConfiguration() *model.Configuration {
+func Configuration() *model.Configuration {
 	// The standalone writer needs neither a user configuration directory nor fonts.
 	disablePDFConfig.Do(api.DisableConfigDir)
 	conf := model.NewDefaultConfiguration()
@@ -41,9 +41,9 @@ func pdfConfiguration() *model.Configuration {
 	return conf
 }
 
-// writePDFMetadata stages and validates an incremental update before replacing
+// Write stages and validates an incremental update before replacing
 // the source. The first source is retained as path + "_original", as with ExifTool.
-func writePDFMetadata(path string, metadata pdfMetadata) error {
+func Write(path string, metadata Metadata) error {
 	original, err := os.Lstat(path)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func writePDFMetadata(path string, metadata pdfMetadata) error {
 	if err != nil {
 		return err
 	}
-	conf := pdfConfiguration()
+	conf := Configuration()
 	ctx, err := api.ReadContext(bytes.NewReader(source), conf)
 	if err != nil {
 		if errors.Is(err, pdfcpu.ErrWrongPassword) || errors.Is(err, pdfcpu.ErrOwnerPasswordRequired) {
@@ -106,7 +106,7 @@ func writePDFMetadata(path string, metadata pdfMetadata) error {
 	if info == nil {
 		return errors.New("PDF Info reference does not resolve to a dictionary")
 	}
-	for key, value := range metadata.fields() {
+	for key, value := range metadata.Fields() {
 		if value == "" {
 			delete(info, key)
 			continue
@@ -157,7 +157,7 @@ func writePDFMetadata(path string, metadata pdfMetadata) error {
 	return replacePDFFile(path, temp.Name(), source, original, os.Rename)
 }
 
-func validatePDFUpdate(path string, source []byte, pages int, metadata pdfMetadata) error {
+func validatePDFUpdate(path string, source []byte, pages int, metadata Metadata) error {
 	updated, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -165,7 +165,7 @@ func validatePDFUpdate(path string, source []byte, pages int, metadata pdfMetada
 	if !bytes.HasPrefix(updated, source) {
 		return errors.New("PDF verification failed: original bytes changed")
 	}
-	ctx, err := api.ReadAndValidate(bytes.NewReader(updated), pdfConfiguration())
+	ctx, err := api.ReadAndValidate(bytes.NewReader(updated), Configuration())
 	if err != nil {
 		return fmt.Errorf("validate updated PDF: %w", err)
 	}
@@ -176,7 +176,7 @@ func validatePDFUpdate(path string, source []byte, pages int, metadata pdfMetada
 	if err != nil {
 		return err
 	}
-	for key, want := range metadata.fields() {
+	for key, want := range metadata.Fields() {
 		if want == "" && info[key] == nil {
 			continue
 		}

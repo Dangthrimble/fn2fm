@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"fn2fm/internal/pdfmeta"
 )
 
 // CI supplies the absolute path of a separately built app. Ordinary unit tests
@@ -47,11 +49,11 @@ func TestBuiltExecutable(t *testing.T) {
 
 	for _, tc := range []struct {
 		fixture, filename string
-		want              pdfMetadata
+		want              pdfmeta.Metadata
 	}{
-		{"no-info-table.pdf", "Table Score ~ JoRu_DaFo[C]+.pdf", pdfMetadata{Author: "John Rutter", Subject: "Dan Forrest", Keywords: "keysf:0, keymi:0, With Accompaniment"}},
-		{"no-info-stream.pdf", "Stream Score ~ _DaFo[4b]-.pdf", pdfMetadata{Subject: "Dan Forrest", Keywords: "Without Accompaniment"}},
-		{"no-info-table.pdf", "Title Score ~ [0].pdf", pdfMetadata{}},
+		{"no-info-table.pdf", "Table Score ~ JoRu_DaFo[C]+.pdf", pdfmeta.Metadata{Author: "John Rutter", Subject: "Dan Forrest", Keywords: "keysf:0, keymi:0, With Accompaniment"}},
+		{"no-info-stream.pdf", "Stream Score ~ _DaFo[4b]-.pdf", pdfmeta.Metadata{Subject: "Dan Forrest", Keywords: "Without Accompaniment"}},
+		{"no-info-table.pdf", "Title Score ~ [0].pdf", pdfmeta.Metadata{}},
 	} {
 		t.Run(tc.filename, func(t *testing.T) {
 			dir := builtCommandDirectory(t)
@@ -80,7 +82,7 @@ func TestBuiltExecutable(t *testing.T) {
 			if err != nil {
 				t.Fatalf("second update failed: %v\n%s", err, output)
 			}
-			assertBuiltMetadata(t, nextPath, source, pdfMetadata{Title: "Updated Score ~ JoRu[0]", Author: "John Rutter"})
+			assertBuiltMetadata(t, nextPath, source, pdfmeta.Metadata{Title: "Updated Score ~ JoRu[0]", Author: "John Rutter"})
 			if !bytes.HasPrefix(readTestFile(t, nextPath), first) {
 				t.Fatal("second update did not retain the first PDF revision")
 			}
@@ -135,7 +137,7 @@ func TestBuiltExecutable(t *testing.T) {
 		if err != nil {
 			t.Fatalf("retry after closing PDF failed: %v\n%s", err, output)
 		}
-		assertBuiltMetadata(t, path, source, pdfMetadata{Title: "Open Score ~ JoRu[C]+", Author: "John Rutter", Keywords: "keysf:0, keymi:0, With Accompaniment"})
+		assertBuiltMetadata(t, path, source, pdfmeta.Metadata{Title: "Open Score ~ JoRu[C]+", Author: "John Rutter", Keywords: "keysf:0, keymi:0, With Accompaniment"})
 	})
 }
 
@@ -160,7 +162,7 @@ func runBuiltCommand(t *testing.T, binary, dir, path string) ([]byte, error) {
 	return cmd.CombinedOutput()
 }
 
-func assertBuiltMetadata(t *testing.T, path string, original []byte, want pdfMetadata) {
+func assertBuiltMetadata(t *testing.T, path string, original []byte, want pdfmeta.Metadata) {
 	t.Helper()
 	updated := readTestFile(t, path)
 	if !bytes.HasPrefix(updated, original) {
@@ -177,7 +179,7 @@ func assertBuiltMetadata(t *testing.T, path string, original []byte, want pdfMet
 	if err != nil {
 		t.Fatal(err)
 	}
-	for key, value := range want.fields() {
+	for key, value := range want.Fields() {
 		if value == "" {
 			if _, exists := info[key]; exists {
 				t.Errorf("empty %s was not removed", key)

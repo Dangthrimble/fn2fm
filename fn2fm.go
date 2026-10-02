@@ -20,6 +20,7 @@ import (
 
 	"fn2fm/internal/filename"
 	"fn2fm/internal/names"
+	"fn2fm/internal/pdfmeta"
 )
 
 // Set by the build workflow; source builds retain the development label.
@@ -103,8 +104,8 @@ func main() {
 		fmt.Printf("            Key: %q\n", key)
 		fmt.Printf("  Accompaniment: %q\n\n", acc)
 
-		err = writePDFMetadata(file, pdfMetadata{
-			Title: fn, Author: comp, Subject: arr, Keywords: metadataKeywords(key, acc),
+		err = pdfmeta.Write(file, pdfmeta.Metadata{
+			Title: fn, Author: comp, Subject: arr, Keywords: pdfmeta.Keywords(key, acc),
 		})
 		if err != nil {
 			log.Printf("Unable to update %q: %v", file, err)

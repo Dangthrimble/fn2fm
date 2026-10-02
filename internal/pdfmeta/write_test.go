@@ -1,4 +1,4 @@
-package main
+package pdfmeta
 
 import (
 	"bytes"
@@ -71,7 +71,7 @@ func writeTestFile(t *testing.T, path string, data []byte) {
 
 func readTestPDF(t *testing.T, data []byte) *model.Context {
 	t.Helper()
-	ctx, err := api.ReadAndValidate(bytes.NewReader(data), pdfConfiguration())
+	ctx, err := api.ReadAndValidate(bytes.NewReader(data), Configuration())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,16 +84,16 @@ func TestWritePDFMetadata(t *testing.T) {
 		data []byte
 	}{
 		{"existing Info", existingInfoPDF(false)},
-		{"no Info classic table", readTestFile(t, "testdata/no-info-table.pdf")},
-		{"no Info xref stream", readTestFile(t, "testdata/no-info-stream.pdf")},
+		{"no Info classic table", readTestFile(t, "../../testdata/no-info-table.pdf")},
+		{"no Info xref stream", readTestFile(t, "../../testdata/no-info-stream.pdf")},
 		{"no final newline", bytes.TrimRight(existingInfoPDF(false), "\r\n")},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			path := filepath.Join(t.TempDir(), "Score.pdf")
 			writeTestFile(t, path, tc.data)
 			before := readTestPDF(t, tc.data)
-			metadata := pdfMetadata{Title: "New score (test)", Author: "André J Thomas", Subject: "Dan Forrest", Keywords: "keysf:-2, keymi:0, With Accompaniment"}
-			if err := writePDFMetadata(path, metadata); err != nil {
+			metadata := Metadata{Title: "New score (test)", Author: "André J Thomas", Subject: "Dan Forrest", Keywords: "keysf:-2, keymi:0, With Accompaniment"}
+			if err := Write(path, metadata); err != nil {
 				t.Fatal(err)
 			}
 			updated := readTestFile(t, path)
@@ -111,7 +111,7 @@ func TestWritePDFMetadata(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			for key, want := range metadata.fields() {
+			for key, want := range metadata.Fields() {
 				got, err := after.DereferenceText(info[key])
 				if err != nil || got != want {
 					t.Errorf("%s = %q, %v; want %q", key, got, err, want)
@@ -131,7 +131,7 @@ func TestWritePDFMetadata(t *testing.T) {
 				}
 			}
 			// A later edit clears absent fields but retains the first backup.
-			if err := writePDFMetadata(path, pdfMetadata{Title: "Title only"}); err != nil {
+			if err := Write(path, Metadata{Title: "Title only"}); err != nil {
 				t.Fatal(err)
 			}
 			second := readTestPDF(t, readTestFile(t, path))
@@ -161,7 +161,7 @@ func TestUnsupportedPDFsRemainUnchanged(t *testing.T) {
 		{"signature field", "signature", existingInfoPDF(true)},
 	}
 	for _, password := range []string{"", "test-password"} {
-		conf := pdfConfiguration()
+		conf := Configuration()
 		conf.UserPW = password
 		conf.OwnerPW = "test-owner"
 		var encrypted bytes.Buffer
@@ -178,7 +178,7 @@ func TestUnsupportedPDFsRemainUnchanged(t *testing.T) {
 			dir := t.TempDir()
 			path := filepath.Join(dir, "Score.pdf")
 			writeTestFile(t, path, tc.data)
-			err := writePDFMetadata(path, pdfMetadata{Title: "New title"})
+			err := Write(path, Metadata{Title: "New title"})
 			if err == nil || !strings.Contains(err.Error(), tc.message) {
 				t.Fatalf("got %v; expected %q", err, tc.message)
 			}
@@ -235,7 +235,7 @@ func TestPDFBackupFailureCleansTemporaryFile(t *testing.T) {
 	if err := os.Mkdir(path+"_original", 0700); err != nil {
 		t.Fatal(err)
 	}
-	if err := writePDFMetadata(path, pdfMetadata{Title: "New title"}); err == nil {
+	if err := Write(path, Metadata{Title: "New title"}); err == nil {
 		t.Fatal("expected backup failure")
 	}
 	if !bytes.Equal(readTestFile(t, path), source) {
@@ -259,7 +259,7 @@ func TestMetadataKeywords(t *testing.T) {
 		{"", "Without Accompaniment", "Without Accompaniment"},
 		{"", "", ""},
 	} {
-		if got := metadataKeywords(tc.key, tc.acc); got != tc.want {
+		if got := Keywords(tc.key, tc.acc); got != tc.want {
 			t.Errorf("got %q, want %q", got, tc.want)
 		}
 	}
