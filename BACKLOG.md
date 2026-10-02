@@ -119,6 +119,26 @@ is a forScore interoperability issue, not a general filename-normalisation task.
   where it improves clarity without undoing preserved refactoring.
 - Consider named string constants for reusable regex fragments only if regex-based
   parsing improves clarity. Replacing the parser was discussed, not decided.
+- Ignore the binary created by `go build ./cmd/fn2fm` when no `-o` path is given.
+  `.gitignore` currently only ignores `/fn2fm` at the repository root, so that
+  binary can sit in `cmd/fn2fm/` and be committed by mistake.
+- Rename `filename.ValidateAndExtension` to something clearer. The old name was
+  `validateFilenameAndExtension`; the exported name was shortened during the
+  layout move and is harder to read.
+- Let dictionary errors and whitespace warnings use the path that was actually
+  loaded. `names.Load` takes a path but still says `names.json` in its messages.
+  That matches today's CLI, which always loads `names.json` from the current
+  folder.
+- Tidy how a missing or invalid dictionary is reported. The CLI still logs the
+  underlying error, then prints `Unable to load names.json`, and skips the extra
+  log for malformed JSON by looking at the error text. Behaviour should stay the
+  same unless a change is agreed.
+- Share the PDF test helpers instead of keeping two copies: one in
+  `cmd/fn2fm/pdf_test_helpers_test.go` and the same helpers in
+  `internal/pdfmeta/write_test.go`.
+- Remove or use the unused `withAcc` and `withoutAcc` constants in
+  `internal/filename`. They were already unused before the layout move. The
+  accompaniment parser still checks `+` and `-` as literals.
 
 ## Remaining provenance question
 

@@ -60,7 +60,7 @@ func packageBinary(binary, version, out string) error {
 		"linux/amd64":   "linux-x64",
 		"linux/arm64":   "linux-arm64",
 	}[osName+"/"+arch]
-	if info.Path != "fn2fm" || platform == "" || settings["CGO_ENABLED"] != "0" {
+	if info.Path != "fn2fm/cmd/fn2fm" || platform == "" || settings["CGO_ENABLED"] != "0" {
 		return errors.New("expected a standalone fn2fm binary for a supported platform")
 	}
 	absoluteBinary, err := filepath.Abs(binary)
@@ -97,7 +97,7 @@ func packageBinary(binary, version, out string) error {
 		{"BACKLOG.md", "BACKLOG.md", 0644},
 		{"DEVELOPMENT_HISTORY.md", "DEVELOPMENT_HISTORY.md", 0644},
 		{"LICENSE", "LICENSE", 0644},
-		{"names.example.json", "names.json", 0644},
+		{"names.example.json", "names.example.json", 0644},
 	} {
 		if err := add(file.name, file.path, file.mode); err != nil {
 			return err

@@ -48,8 +48,9 @@ may therefore continue to display older XMP values, as it did with the legacy
 ExifTool workflow. Incremental updates retain previous PDF revisions; this is
 not a method for permanently erasing old metadata.
 
-Building from source now requires Go 1.25 or newer. Use `go build -o dist/fn2fm .`
-on macOS or `go build -o dist/fn2fm.exe .` on Windows. The compiled app does not
+Building from source now requires Go 1.25 or newer. Use
+`go build -o dist/fn2fm ./cmd/fn2fm` on macOS or
+`go build -o dist/fn2fm.exe ./cmd/fn2fm` on Windows. The compiled app does not
 require a Go installation. Automated runtime tests have passed on Windows Server
 2025 x64; desktop PDF reader behaviour has not been manually checked on Windows.
 
@@ -66,7 +67,8 @@ cover metadata, paths with spaces, repeated updates, backups, rejected PDFs and
 replacement failure while a Windows process holds the PDF open.
 
 To run the executable checks locally, build fn2fm, set `FN2FM_TEST_BINARY` to its
-absolute path, and run `go test -count=1 -v -run '^TestBuiltExecutable$' .`. For a
+absolute path, and run
+`go test -count=1 -v -run '^TestBuiltExecutable$' ./cmd/fn2fm`. For a
 version-stamped binary, also set `FN2FM_TEST_VERSION` to the embedded version.
 Without that variable, the executable checks are skipped; the Windows file-lock
 case also skips on other operating systems. These automated checks do not test
@@ -195,10 +197,10 @@ Use empty brackets (`[]`) when no key can be specified, for example for an atona
 
 ## Name dictionary
 
-The supplied `names.json` is a starter dictionary; customise it for your own scores.
-fn2fm loads `names.json` from the current working directory (the folder from which
-you run the command). You can keep it with the PDFs you work on and edit it there;
-it does not need to be beside the executable.
+The repository supplies `names.example.json` as a starter dictionary. Copy it to
+`names.json` beside your scores and customise that working copy. fn2fm loads
+`names.json` from the current working directory (the folder from which you run
+the command). It does not need to be beside the executable.
 
 When loading the dictionary, fn2fm warns if an abbreviation or name has leading
 or trailing whitespace. Warnings identify the affected entry. Processing continues
