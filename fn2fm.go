@@ -19,6 +19,8 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+
+	"fn2fm/internal/filename"
 )
 
 // Set by the build workflow; source builds retain the development label.
@@ -51,39 +53,39 @@ func main() {
 
 	for _, file = range os.Args[1:] {
 		fmt.Printf("Parsing %q...\n", file)
-		fn, err = validateFilenameAndExtension(file)
+		fn, err = filename.ValidateAndExtension(file)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			os.Rename(file, file+"_rename")
 			continue
 		}
 
-		md, err = validateMetadataTags(fn)
+		md, err = filename.ValidateMetadataTags(fn)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			os.Rename(file, file+"_rename")
 			continue
 		}
 
-		comp, err = parseComposers(md, ca)
+		comp, err = filename.ParseComposers(md, ca)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
-		arr, err = parseArrangers(md, ca)
+		arr, err = filename.ParseArrangers(md, ca)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
-		key, err = parseKey(md)
+		key, err = filename.ParseKey(md)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
-		acc, err = parseAccompaniment(md)
+		acc, err = filename.ParseAccompaniment(md)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			continue

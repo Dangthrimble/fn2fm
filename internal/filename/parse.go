@@ -1,4 +1,4 @@
-package main
+package filename
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ const (
 	charToAvoid   = "\"*./:;<>?\\|" // Characters to avoid according to cloud storage
 )
 
-func validateFilenameAndExtension(fnExt string) (string, error) {
+func ValidateAndExtension(fnExt string) (string, error) {
 
 	var (
 		ok bool
@@ -69,7 +69,7 @@ func validateFilenameAndExtension(fnExt string) (string, error) {
 	return fn, nil
 }
 
-func validateMetadataTags(fn string) (string, error) {
+func ValidateMetadataTags(fn string) (string, error) {
 
 	var md string // Song's metadata embedded in the filename
 
@@ -101,7 +101,7 @@ func validateMetadataTags(fn string) (string, error) {
 	return md, nil
 }
 
-func parseComposers(md string, ca map[string]string) (string, error) {
+func ParseComposers(md string, ca map[string]string) (string, error) {
 
 	var splitMd []string // Metadata split into slices
 
@@ -117,7 +117,7 @@ func parseComposers(md string, ca map[string]string) (string, error) {
 	return findComposersOrArrangers(splitMd[0], ca)
 }
 
-func parseArrangers(md string, ca map[string]string) (string, error) {
+func ParseArrangers(md string, ca map[string]string) (string, error) {
 
 	var (
 		splitMd []string // Metadata split into slices
@@ -156,7 +156,7 @@ func findComposersOrArrangers(key string, ca map[string]string) (string, error) 
 	return strings.TrimSpace(names), nil
 }
 
-func parseKey(md string) (string, error) {
+func ParseKey(md string) (string, error) {
 
 	var (
 		ok      bool
@@ -227,7 +227,7 @@ func parseKey(md string) (string, error) {
 	return key, nil
 }
 
-func parseAccompaniment(md string) (string, error) {
+func ParseAccompaniment(md string) (string, error) {
 
 	var (
 		splitMd []string // Metadata split into slices
