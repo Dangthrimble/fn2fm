@@ -12,15 +12,14 @@ Usage:
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
-	"sort"
 	"strings"
 
 	"fn2fm/internal/filename"
+	"fn2fm/internal/names"
 )
 
 // Set by the build workflow; source builds retain the development label.
@@ -45,10 +44,18 @@ func main() {
 		failed bool              // Whether a PDF update failed
 	)
 
-	ca, err = readComposersArrangers()
+	var warnings []string
+	ca, warnings, err = names.Load("names.json")
 	if err != nil {
+		// Match prior behaviour: log the underlying error for missing/unreadable files.
+		if !strings.Contains(err.Error(), "invalid names.json:") {
+			log.Println(err)
+		}
 		fmt.Printf("Unable to load names.json: %v\n", err)
 		os.Exit(1)
+	}
+	for _, warning := range warnings {
+		log.Println(warning)
 	}
 
 	for _, file = range os.Args[1:] {
@@ -109,37 +116,4 @@ func main() {
 	if failed {
 		os.Exit(1)
 	}
-}
-
-func readComposersArrangers() (map[string]string, error) {
-
-	var (
-		err error
-		f   []byte            // Contents of file of composers' and arrangers' abbreviations and names
-		ca  map[string]string // Map of composers and arrangers with abbreviation as the key
-	)
-	f, err = os.ReadFile("names.json")
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	if err := json.Unmarshal(f, &ca); err != nil {
-		return nil, fmt.Errorf("invalid names.json: %w", err)
-	}
-	// Sort abbreviations so warnings have a consistent order.
-	abbreviations := make([]string, 0, len(ca))
-	for abbreviation := range ca {
-		abbreviations = append(abbreviations, abbreviation)
-	}
-	sort.Strings(abbreviations)
-	for _, abbreviation := range abbreviations {
-		if abbreviation != strings.TrimSpace(abbreviation) {
-			log.Printf("WARNING: names.json abbreviation %q has leading or trailing whitespace", abbreviation)
-		}
-		name := ca[abbreviation]
-		if name != strings.TrimSpace(name) {
-			log.Printf("WARNING: names.json name %q for abbreviation %q has leading or trailing whitespace", name, abbreviation)
-		}
-	}
-	return ca, err
 }
