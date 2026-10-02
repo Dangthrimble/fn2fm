@@ -53,33 +53,39 @@ func main() {
 		fmt.Printf("Parsing %q...\n", file)
 		fn, err = validateFilenameAndExtension(file)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			os.Rename(file, file+"_rename")
 			continue
 		}
 
 		md, err = validateMetadataTags(fn)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			os.Rename(file, file+"_rename")
 			continue
 		}
 
 		comp, err = parseComposers(md, ca)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
 		arr, err = parseArrangers(md, ca)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
 		key, err = parseKey(md)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
 		acc, err = parseAccompaniment(md)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 

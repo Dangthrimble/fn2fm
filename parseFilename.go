@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -38,22 +37,19 @@ func validateFilenameAndExtension(fnExt string) (string, error) {
 	// If the file doesn't end with validExtension, it is not a suitable file.
 	fn, ok = strings.CutSuffix(fnExt, validExt)
 	if !ok {
-		fmt.Printf("  ERROR: %q is not a PDF file\n", fnExt)
-		return "", errors.New(fmt.Sprintf("invalid file type"))
+		return "", fmt.Errorf("%q is not a PDF file", fnExt)
 	}
 
 	// If the filename has leading or trailing spaces, it may not be supported
 	// by cloud storage.
 	if fn != strings.Trim(fn, " ") {
-		fmt.Printf("  ERROR: %q has leading or trailing spaces\n", fn)
-		return "", errors.New(fmt.Sprintf("invalid filename"))
+		return "", fmt.Errorf("%q has leading or trailing spaces", fn)
 	}
 
 	// If the filename doesn't have a single instance of metadataPrefix, the
 	// metadata cannot be reliably parsed.
 	if strings.Count(fn, mdPrefix) != 1 {
-		fmt.Printf("  ERROR: %q must have a single %q in the filename to allow metadata to be parsed\n", fnExt, mdPrefix)
-		return "", errors.New(fmt.Sprintf("invalid filename"))
+		return "", fmt.Errorf("%q must have a single %q in the filename to allow metadata to be parsed", fnExt, mdPrefix)
 	}
 
 	// To avoid any complications with internationalisation, ensure the filename
@@ -62,12 +58,10 @@ func validateFilenameAndExtension(fnExt string) (string, error) {
 	for i, w := 0, 0; i < len(fn); i += w {
 		rune, width := utf8.DecodeRuneInString(fn[i:])
 		if (rune < minPrintASCII) || (rune > maxPrintASCII) {
-			fmt.Printf("  ERROR: %q is not a valid character in %q\n", rune, fn)
-			return "", errors.New(fmt.Sprintf("invalid filename"))
+			return "", fmt.Errorf("%q is not a valid character in %q", rune, fn)
 		}
 		if strings.Contains(charToAvoid, string(rune)) {
-			fmt.Printf("  ERROR: %q is not a valid character in %q\n", rune, fn)
-			return "", errors.New(fmt.Sprintf("invalid filename"))
+			return "", fmt.Errorf("%q is not a valid character in %q", rune, fn)
 		}
 		w = width
 	}
@@ -89,8 +83,7 @@ func validateMetadataTags(fn string) (string, error) {
 	if strings.Count(md, arrPrefix) > 1 ||
 		strings.Count(md, keyPrefix) != 1 ||
 		strings.Count(md, keySuffix) != 1 {
-		fmt.Printf("  ERROR: wrong number of metadata tags\n")
-		return "", errors.New(fmt.Sprintf("invalid metadata tags"))
+		return "", fmt.Errorf("wrong number of metadata tags")
 	}
 
 	// The tag locations are required to determine whether any
@@ -102,11 +95,10 @@ func validateMetadataTags(fn string) (string, error) {
 	// If arrPrefix is after keyPrefix, or keyPrefix is after keySuffix, the
 	// metadata cannot be parsed.
 	if (arrLoc > keyLoc) || (keyLoc > accLoc) {
-		fmt.Printf("  ERROR: metadata tags in wrong order\n")
-		return "", errors.New(fmt.Sprintf("invalid metadata tags"))
+		return "", fmt.Errorf("metadata tags in wrong order")
 	}
 
-	return string(md), nil
+	return md, nil
 }
 
 func parseComposers(md string, ca map[string]string) (string, error) {
@@ -158,8 +150,7 @@ func findComposersOrArrangers(key string, ca map[string]string) (string, error) 
 
 	names, ok = ca[key]
 	if !ok {
-		fmt.Printf("  ERROR: %q not found\n", key)
-		return "", errors.New(fmt.Sprintf("composers or arrangers not found"))
+		return "", fmt.Errorf("%q not found", key)
 	}
 
 	return strings.TrimSpace(names), nil
@@ -229,8 +220,8 @@ func parseKey(md string) (string, error) {
 	splitMd = strings.Split(splitMd[1], keySuffix)
 	key, ok = keys[strings.Trim(splitMd[0], " ")]
 	if !ok {
-		fmt.Printf("  ERROR: %q is not a valid key signature\n", key)
-		return "", errors.New(fmt.Sprintf("invalid key signature"))
+		// Preserve existing message text: failed map lookup leaves key empty.
+		return "", fmt.Errorf("%q is not a valid key signature", key)
 	}
 
 	return key, nil
@@ -254,7 +245,6 @@ func parseAccompaniment(md string) (string, error) {
 	case "":
 		return "", nil
 	default:
-		fmt.Printf("  ERROR: %q is not valid for accompaniment\n", accMd)
-		return "", errors.New(fmt.Sprintf("invalid accompaniment"))
+		return "", fmt.Errorf("%q is not valid for accompaniment", accMd)
 	}
 }
