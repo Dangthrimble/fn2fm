@@ -100,7 +100,7 @@ jobs:
           go test -count=1 -v -run '^TestBuiltExecutable$' ./cmd/fn2fm
 
       - name: Package executable and instructions
-        run: go run ./internal/buildpackage -binary "dist/${{ matrix.binary }}" -version "$env:FN2FM_VERSION"
+        run: go run ./cmd/buildpackage -binary "dist/${{ matrix.binary }}" -version "$env:FN2FM_VERSION"
 
       - name: Upload development package
         if: github.event_name != 'pull_request'
