@@ -195,10 +195,10 @@ Use empty brackets (`[]`) when no key can be specified, for example for an atona
 
 ## Name dictionary
 
-The supplied `names.json` is a starter dictionary; customise it for your own scores.
-fn2fm loads `names.json` from the current working directory (the folder from which
-you run the command). You can keep it with the PDFs you work on and edit it there;
-it does not need to be beside the executable.
+The repository supplies `names.example.json` as a starter dictionary. Copy it to
+`names.json` beside your scores and customise that working copy. fn2fm loads
+`names.json` from the current working directory (the folder from which you run
+the command). It does not need to be beside the executable.
 
 When loading the dictionary, fn2fm warns if an abbreviation or name has leading
 or trailing whitespace. Warnings identify the affected entry. Processing continues
