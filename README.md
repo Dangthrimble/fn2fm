@@ -48,8 +48,9 @@ may therefore continue to display older XMP values, as it did with the legacy
 ExifTool workflow. Incremental updates retain previous PDF revisions; this is
 not a method for permanently erasing old metadata.
 
-Building from source now requires Go 1.25 or newer. Use `go build -o dist/fn2fm .`
-on macOS or `go build -o dist/fn2fm.exe .` on Windows. The compiled app does not
+Building from source now requires Go 1.25 or newer. Use
+`go build -o dist/fn2fm ./cmd/fn2fm` on macOS or
+`go build -o dist/fn2fm.exe ./cmd/fn2fm` on Windows. The compiled app does not
 require a Go installation. Automated runtime tests have passed on Windows Server
 2025 x64; desktop PDF reader behaviour has not been manually checked on Windows.
 
@@ -66,7 +67,8 @@ cover metadata, paths with spaces, repeated updates, backups, rejected PDFs and
 replacement failure while a Windows process holds the PDF open.
 
 To run the executable checks locally, build fn2fm, set `FN2FM_TEST_BINARY` to its
-absolute path, and run `go test -count=1 -v -run '^TestBuiltExecutable$' .`. For a
+absolute path, and run
+`go test -count=1 -v -run '^TestBuiltExecutable$' ./cmd/fn2fm`. For a
 version-stamped binary, also set `FN2FM_TEST_VERSION` to the embedded version.
 Without that variable, the executable checks are skipped; the Windows file-lock
 case also skips on other operating systems. These automated checks do not test

@@ -16,7 +16,9 @@ The [README](README.md) describes current behaviour.
   specified, including for atonal music. This supersedes the earlier rejection
   rule on 25 September 2026.
 - Load the editable `names.json` from the current working directory. The checked-in
-  dictionary remains a starter; personal dictionaries are not replaced.
+  starter is `names.example.json`; personal dictionaries are not replaced.
+- Keep the Go layout as `cmd/fn2fm` (CLI), `cmd/buildpackage` (CI packaging), and
+  `internal/{filename,names,pdfmeta}` for shared logic.
 - Write PDF Info metadata directly with pdfcpu, using incremental updates to
   preserve original bytes and unrelated metadata. Preserve XMP for compatibility
   with the legacy workflow; Info/XMP synchronisation remains a separate issue.
@@ -649,3 +651,16 @@ packaging, licensing and update review; it was not adopted.
   documents now travel with the README and remain usable offline, without
   depending on a GitHub branch. Both documents are covered by the package's
   existing content checksums and byte-for-byte archive verification.
+
+## Repository layout restructure (2 October 2026)
+
+- Returned the tree to a `cmd/` + `internal/` layout without changing filename
+  parsing, dictionary loading from the working directory, or PDF write behaviour.
+- `cmd/fn2fm` holds the CLI and its integration tests. Shared code lives in
+  `internal/filename`, `internal/names` and `internal/pdfmeta`. Packaging moved
+  from `internal/buildpackage` to `cmd/buildpackage`.
+- The checked-in starter dictionary is `names.example.json`. Runtime still loads
+  `names.json` from the current working directory. Packages continue to ship only
+  the example file.
+- Build and executable checks use `./cmd/fn2fm`. Earlier history that mentions a
+  root `package main` or `internal/buildpackage` records the layout at that time.
