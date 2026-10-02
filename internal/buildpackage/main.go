@@ -60,7 +60,7 @@ func packageBinary(binary, version, out string) error {
 		"linux/amd64":   "linux-x64",
 		"linux/arm64":   "linux-arm64",
 	}[osName+"/"+arch]
-	if info.Path != "fn2fm" || platform == "" || settings["CGO_ENABLED"] != "0" {
+	if info.Path != "fn2fm/cmd/fn2fm" || platform == "" || settings["CGO_ENABLED"] != "0" {
 		return errors.New("expected a standalone fn2fm binary for a supported platform")
 	}
 	absoluteBinary, err := filepath.Abs(binary)

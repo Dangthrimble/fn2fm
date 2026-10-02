@@ -91,13 +91,13 @@ jobs:
           "FN2FM_VERSION=$version" >> $env:GITHUB_ENV
 
       - name: Build versioned standalone executable
-        run: go build -trimpath -ldflags "-X main.version=$env:FN2FM_VERSION" -o "dist/${{ matrix.binary }}" .
+        run: go build -trimpath -ldflags "-X main.version=$env:FN2FM_VERSION" -o "dist/${{ matrix.binary }}" ./cmd/fn2fm
 
       - name: Test the built executable on disposable PDFs
         run: |
           $env:FN2FM_TEST_BINARY = (Resolve-Path -LiteralPath 'dist/${{ matrix.binary }}').Path
           $env:FN2FM_TEST_VERSION = $env:FN2FM_VERSION
-          go test -count=1 -v -run '^TestBuiltExecutable$' .
+          go test -count=1 -v -run '^TestBuiltExecutable$' ./cmd/fn2fm
 
       - name: Package executable and instructions
         run: go run ./internal/buildpackage -binary "dist/${{ matrix.binary }}" -version "$env:FN2FM_VERSION"

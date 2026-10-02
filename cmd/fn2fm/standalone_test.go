@@ -58,7 +58,7 @@ func TestBuiltExecutable(t *testing.T) {
 		t.Run(tc.filename, func(t *testing.T) {
 			dir := builtCommandDirectory(t)
 			path := filepath.Join(dir, tc.filename)
-			source := readTestFile(t, filepath.Join("testdata", tc.fixture))
+			source := readTestFile(t, filepath.Join("..", "..", "testdata", tc.fixture))
 			writeTestFile(t, path, source)
 			tc.want.Title = strings.TrimSuffix(tc.filename, ".pdf")
 
@@ -113,7 +113,7 @@ func TestBuiltExecutable(t *testing.T) {
 		}
 		dir := builtCommandDirectory(t)
 		path := filepath.Join(dir, "Open Score ~ JoRu[C]+.pdf")
-		source := readTestFile(t, "testdata/no-info-table.pdf")
+		source := readTestFile(t, filepath.Join("..", "..", "testdata", "no-info-table.pdf"))
 		writeTestFile(t, path, source)
 		// Go opens this handle with read/write sharing, but without delete sharing.
 		// The child can read the PDF yet cannot replace it until this handle closes.
