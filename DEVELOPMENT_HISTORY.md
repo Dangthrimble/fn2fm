@@ -664,3 +664,10 @@ packaging, licensing and update review; it was not adopted.
   the example file.
 - Build and executable checks use `./cmd/fn2fm`. Earlier history that mentions a
   root `package main` or `internal/buildpackage` records the layout at that time.
+
+## Invalid key error text (3 October 2026)
+
+- `ParseKey` now reports the supplied key text when a signature is rejected.
+  Previously a failed map lookup left the result empty, so the error showed
+  `"" is not a valid key signature` instead of the invalid input such as `1x`.
+- The invalid-key unit test now asserts that the error contains the rejected text.

@@ -7,8 +7,6 @@ current usage is in [README.md](README.md).
 
 ## Reliability and command-line behaviour
 
-- Preserve the supplied key text in error messages. A failed lookup currently
-  reports the empty result instead of the invalid input.
 - Handle errors from filename/tag `os.Rename` calls and review the automatic
   `_rename` behaviour. Other metadata parsing errors still skip the file; PDF
   update failures already retain the filename and contents.

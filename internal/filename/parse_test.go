@@ -1,6 +1,7 @@
 package filename
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -240,6 +241,9 @@ func TestParseKey(t *testing.T) {
 
 		if got != want || err == nil {
 			t.Errorf("got %q, want %q given", got, want)
+		}
+		if err == nil || !strings.Contains(err.Error(), `"1x"`) {
+			t.Errorf("error %v does not preserve the invalid key text", err)
 		}
 	})
 }

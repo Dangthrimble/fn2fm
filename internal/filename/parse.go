@@ -218,10 +218,10 @@ func ParseKey(md string) (string, error) {
 	splitMd = strings.Split(md, keyPrefix)
 	// ... and before the keySuffix.
 	splitMd = strings.Split(splitMd[1], keySuffix)
-	key, ok = keys[strings.Trim(splitMd[0], " ")]
+	raw := strings.Trim(splitMd[0], " ")
+	key, ok = keys[raw]
 	if !ok {
-		// Preserve existing message text: failed map lookup leaves key empty.
-		return "", fmt.Errorf("%q is not a valid key signature", key)
+		return "", fmt.Errorf("%q is not a valid key signature", raw)
 	}
 
 	return key, nil
