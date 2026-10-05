@@ -71,6 +71,32 @@ func TestFN2FMStandaloneCommand(t *testing.T) {
 	}
 }
 
+func TestFN2FMRenameFailure(t *testing.T) {
+	dir := t.TempDir()
+	name := "Bad Score.pdf"
+	path := filepath.Join(dir, name)
+	source := existingInfoPDF(false)
+	writeTestFile(t, path, source)
+	writeTestFile(t, filepath.Join(dir, "names.json"), []byte(`{"JoRu":"John Rutter"}`))
+	if err := os.Mkdir(path+"_rename", 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=^TestFN2FMCLIHelper$", "--", name)
+	cmd.Dir = dir
+	cmd.Env = append(os.Environ(), "FN2FM_TEST_MAIN=1", "PATH="+dir)
+	output, err := cmd.CombinedOutput()
+	if err == nil {
+		t.Fatalf("expected nonzero exit when rename fails\n%s", output)
+	}
+	if !strings.Contains(string(output), "unable to rename") {
+		t.Fatalf("missing rename failure diagnostic: %s", output)
+	}
+	if !bytes.Equal(readTestFile(t, path), source) {
+		t.Fatal("failed rename changed or removed the original PDF")
+	}
+}
+
 func TestFN2FMEmptyKeyCommand(t *testing.T) {
 	for _, tc := range []struct{ suffix, keywords string }{
 		{"[]", ""},

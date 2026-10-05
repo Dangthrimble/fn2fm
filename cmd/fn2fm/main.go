@@ -42,7 +42,7 @@ func main() {
 		arr    string            // Song's arranger(s)
 		key    string            // Song's initial key signature
 		acc    string            // Whether or not the song has an accompaniment
-		failed bool              // Whether a PDF update failed
+		failed bool // Whether a PDF update or rejected-file rename failed
 	)
 
 	var warnings []string
@@ -64,14 +64,18 @@ func main() {
 		fn, err = filename.ValidateAndExtension(file)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
-			os.Rename(file, file+"_rename")
+			if !renameRejectedFile(file) {
+				failed = true
+			}
 			continue
 		}
 
 		md, err = filename.ValidateMetadataTags(fn)
 		if err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
-			os.Rename(file, file+"_rename")
+			if !renameRejectedFile(file) {
+				failed = true
+			}
 			continue
 		}
 
@@ -117,4 +121,16 @@ func main() {
 	if failed {
 		os.Exit(1)
 	}
+}
+
+// renameRejectedFile moves a filename/tag validation failure aside with the
+// existing `_rename` suffix. It reports rename failures and returns false when
+// the move did not succeed.
+func renameRejectedFile(file string) bool {
+	target := file + "_rename"
+	if err := os.Rename(file, target); err != nil {
+		fmt.Printf("  ERROR: unable to rename %q to %q: %v\n", file, target, err)
+		return false
+	}
+	return true
 }

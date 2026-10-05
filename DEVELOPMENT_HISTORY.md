@@ -671,3 +671,11 @@ packaging, licensing and update review; it was not adopted.
   Previously a failed map lookup left the result empty, so the error showed
   `"" is not a valid key signature` instead of the invalid input such as `1x`.
 - The invalid-key unit test now asserts that the error contains the rejected text.
+
+## Rejected-file rename errors (5 October 2026)
+
+- Filename and metadata-tag validation still rename rejected files with the
+  `_rename` suffix. The CLI now reports `os.Rename` failures, leaves the
+  original file in place, and exits nonzero when a rename fails.
+- Added a command-level regression that blocks the rename target with a
+  directory and checks the diagnostic and exit status.

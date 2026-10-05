@@ -7,9 +7,6 @@ current usage is in [README.md](README.md).
 
 ## Reliability and command-line behaviour
 
-- Handle errors from filename/tag `os.Rename` calls and review the automatic
-  `_rename` behaviour. Other metadata parsing errors still skip the file; PDF
-  update failures already retain the filename and contents.
 - Add command-line help and consider a dry-run option and a success/failure
   summary. Keep these as proposals until their behaviour is defined.
 - Make wildcard/glob handling consistent across macOS and Windows shells.
