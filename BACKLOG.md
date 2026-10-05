@@ -31,6 +31,11 @@ current usage is in [README.md](README.md).
   set with tests before any future changes. Preserve the distinction between
   forScore's title restrictions, documented in its 6 March 2024 support reply,
   and fn2fm's broader cloud-storage/ASCII restrictions (see the README).
+- Reject filenames that contain two or more consecutive spaces. forScore appears
+  to compress runs of spaces to a single space when fetching the Title; fn2fm
+  currently copies the filename stem into Title unchanged, so consecutive spaces
+  would be altered on import. Report an error so supplied metadata stays as
+  close as possible to what forScore will display.
 - Resolve the named-key grammar if broadening support: the earlier requirement
   used `[A-G][#b]?m?`, while the implementation accepts a fixed list of keys.
   Accidental counts remain valid and do not imply major or minor. Empty keys
