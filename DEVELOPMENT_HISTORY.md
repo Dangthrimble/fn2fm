@@ -16,7 +16,9 @@ The [README](README.md) describes current behaviour.
   specified, including for atonal music. This supersedes the earlier rejection
   rule on 25 September 2026.
 - Load the editable `names.json` from the current working directory. The checked-in
-  dictionary remains a starter; personal dictionaries are not replaced.
+  starter is `names.example.json`; personal dictionaries are not replaced.
+- Keep the Go layout as `cmd/fn2fm` (CLI), `cmd/buildpackage` (CI packaging), and
+  `internal/{filename,names,pdfmeta}` for shared logic.
 - Write PDF Info metadata directly with pdfcpu, using incremental updates to
   preserve original bytes and unrelated metadata. Preserve XMP for compatibility
   with the legacy workflow; Info/XMP synchronisation remains a separate issue.
@@ -649,3 +651,38 @@ packaging, licensing and update review; it was not adopted.
   documents now travel with the README and remain usable offline, without
   depending on a GitHub branch. Both documents are covered by the package's
   existing content checksums and byte-for-byte archive verification.
+
+## Repository layout restructure (2 October 2026)
+
+- Returned the tree to a `cmd/` + `internal/` layout without changing filename
+  parsing, dictionary loading from the working directory, or PDF write behaviour.
+- `cmd/fn2fm` holds the CLI and its integration tests. Shared code lives in
+  `internal/filename`, `internal/names` and `internal/pdfmeta`. Packaging moved
+  from `internal/buildpackage` to `cmd/buildpackage`.
+- The checked-in starter dictionary is `names.example.json`. Runtime still loads
+  `names.json` from the current working directory. Packages continue to ship only
+  the example file.
+- Build and executable checks use `./cmd/fn2fm`. Earlier history that mentions a
+  root `package main` or `internal/buildpackage` records the layout at that time.
+
+## Invalid key error text (3 October 2026)
+
+- `ParseKey` now reports the supplied key text when a signature is rejected.
+  Previously a failed map lookup left the result empty, so the error showed
+  `"" is not a valid key signature` instead of the invalid input such as `1x`.
+- The invalid-key unit test now asserts that the error contains the rejected text.
+
+## Rejected-file rename errors (5 October 2026)
+
+- Filename and metadata-tag validation still rename rejected files with the
+  `_rename` suffix. The CLI now reports `os.Rename` failures, leaves the
+  original file in place, and exits nonzero when a rename fails.
+- Added a command-level regression that blocks the rename target with a
+  directory and checks the diagnostic and exit status.
+
+## Starter dictionary covers README examples (5 October 2026)
+
+- Extended `names.example.json` with the abbreviations used in the README
+  running example and Examples section: `AdAd`, `AnTh`, `DaFo`, `DaHa`,
+  `GbAs`, `JaOc`, `KaJe`, `MoLa` and `RiSm`. README example filenames were
+  left unchanged. Personal `names.json` files remain separate.

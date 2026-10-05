@@ -12,13 +12,15 @@ Usage:
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
-	"sort"
 	"strings"
+
+	"fn2fm/internal/filename"
+	"fn2fm/internal/names"
+	"fn2fm/internal/pdfmeta"
 )
 
 // Set by the build workflow; source builds retain the development label.
@@ -40,46 +42,64 @@ func main() {
 		arr    string            // Song's arranger(s)
 		key    string            // Song's initial key signature
 		acc    string            // Whether or not the song has an accompaniment
-		failed bool              // Whether a PDF update failed
+		failed bool // Whether a PDF update or rejected-file rename failed
 	)
 
-	ca, err = readComposersArrangers()
+	var warnings []string
+	ca, warnings, err = names.Load("names.json")
 	if err != nil {
+		// Match prior behaviour: log the underlying error for missing/unreadable files.
+		if !strings.Contains(err.Error(), "invalid names.json:") {
+			log.Println(err)
+		}
 		fmt.Printf("Unable to load names.json: %v\n", err)
 		os.Exit(1)
+	}
+	for _, warning := range warnings {
+		log.Println(warning)
 	}
 
 	for _, file = range os.Args[1:] {
 		fmt.Printf("Parsing %q...\n", file)
-		fn, err = validateFilenameAndExtension(file)
+		fn, err = filename.ValidateAndExtension(file)
 		if err != nil {
-			os.Rename(file, file+"_rename")
+			fmt.Printf("  ERROR: %v\n", err)
+			if !renameRejectedFile(file) {
+				failed = true
+			}
 			continue
 		}
 
-		md, err = validateMetadataTags(fn)
+		md, err = filename.ValidateMetadataTags(fn)
 		if err != nil {
-			os.Rename(file, file+"_rename")
+			fmt.Printf("  ERROR: %v\n", err)
+			if !renameRejectedFile(file) {
+				failed = true
+			}
 			continue
 		}
 
-		comp, err = parseComposers(md, ca)
+		comp, err = filename.ParseComposers(md, ca)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
-		arr, err = parseArrangers(md, ca)
+		arr, err = filename.ParseArrangers(md, ca)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
-		key, err = parseKey(md)
+		key, err = filename.ParseKey(md)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
-		acc, err = parseAccompaniment(md)
+		acc, err = filename.ParseAccompaniment(md)
 		if err != nil {
+			fmt.Printf("  ERROR: %v\n", err)
 			continue
 		}
 
@@ -88,8 +108,8 @@ func main() {
 		fmt.Printf("            Key: %q\n", key)
 		fmt.Printf("  Accompaniment: %q\n\n", acc)
 
-		err = writePDFMetadata(file, pdfMetadata{
-			Title: fn, Author: comp, Subject: arr, Keywords: metadataKeywords(key, acc),
+		err = pdfmeta.Write(file, pdfmeta.Metadata{
+			Title: fn, Author: comp, Subject: arr, Keywords: pdfmeta.Keywords(key, acc),
 		})
 		if err != nil {
 			log.Printf("Unable to update %q: %v", file, err)
@@ -103,35 +123,14 @@ func main() {
 	}
 }
 
-func readComposersArrangers() (map[string]string, error) {
-
-	var (
-		err error
-		f   []byte            // Contents of file of composers' and arrangers' abbreviations and names
-		ca  map[string]string // Map of composers and arrangers with abbreviation as the key
-	)
-	f, err = os.ReadFile("names.json")
-	if err != nil {
-		log.Println(err)
-		return nil, err
+// renameRejectedFile moves a filename/tag validation failure aside with the
+// existing `_rename` suffix. It reports rename failures and returns false when
+// the move did not succeed.
+func renameRejectedFile(file string) bool {
+	target := file + "_rename"
+	if err := os.Rename(file, target); err != nil {
+		fmt.Printf("  ERROR: unable to rename %q to %q: %v\n", file, target, err)
+		return false
 	}
-	if err := json.Unmarshal(f, &ca); err != nil {
-		return nil, fmt.Errorf("invalid names.json: %w", err)
-	}
-	// Sort abbreviations so warnings have a consistent order.
-	abbreviations := make([]string, 0, len(ca))
-	for abbreviation := range ca {
-		abbreviations = append(abbreviations, abbreviation)
-	}
-	sort.Strings(abbreviations)
-	for _, abbreviation := range abbreviations {
-		if abbreviation != strings.TrimSpace(abbreviation) {
-			log.Printf("WARNING: names.json abbreviation %q has leading or trailing whitespace", abbreviation)
-		}
-		name := ca[abbreviation]
-		if name != strings.TrimSpace(name) {
-			log.Printf("WARNING: names.json name %q for abbreviation %q has leading or trailing whitespace", name, abbreviation)
-		}
-	}
-	return ca, err
+	return true
 }

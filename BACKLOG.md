@@ -7,16 +7,9 @@ current usage is in [README.md](README.md).
 
 ## Reliability and command-line behaviour
 
-- Preserve the supplied key text in error messages. A failed lookup currently
-  reports the empty result instead of the invalid input.
-- Handle errors from filename/tag `os.Rename` calls and review the automatic
-  `_rename` behaviour. Other metadata parsing errors still skip the file; PDF
-  update failures already retain the filename and contents.
 - Add command-line help and consider a dry-run option and a success/failure
   summary. Keep these as proposals until their behaviour is defined.
 - Make wildcard/glob handling consistent across macOS and Windows shells.
-- Reconcile README name-code examples with the starter dictionary. Preserve the
-  distinction between the repository example and personal working dictionaries.
 - Extend the existing regression and integration tests as behaviour changes.
   Standalone command and built-executable tests already exist; do not replace
   the suite wholesale or treat integration testing as entirely absent.
@@ -38,6 +31,11 @@ current usage is in [README.md](README.md).
   set with tests before any future changes. Preserve the distinction between
   forScore's title restrictions, documented in its 6 March 2024 support reply,
   and fn2fm's broader cloud-storage/ASCII restrictions (see the README).
+- Reject filenames that contain two or more consecutive spaces. forScore appears
+  to compress runs of spaces to a single space when fetching the Title; fn2fm
+  currently copies the filename stem into Title unchanged, so consecutive spaces
+  would be altered on import. Report an error so supplied metadata stays as
+  close as possible to what forScore will display.
 - Resolve the named-key grammar if broadening support: the earlier requirement
   used `[A-G][#b]?m?`, while the implementation accepts a fixed list of keys.
   Accidental counts remain valid and do not imply major or minor. Empty keys
@@ -119,6 +117,26 @@ is a forScore interoperability issue, not a general filename-normalisation task.
   where it improves clarity without undoing preserved refactoring.
 - Consider named string constants for reusable regex fragments only if regex-based
   parsing improves clarity. Replacing the parser was discussed, not decided.
+- Ignore the binary created by `go build ./cmd/fn2fm` when no `-o` path is given.
+  `.gitignore` currently only ignores `/fn2fm` at the repository root, so that
+  binary can sit in `cmd/fn2fm/` and be committed by mistake.
+- Rename `filename.ValidateAndExtension` to something clearer. The old name was
+  `validateFilenameAndExtension`; the exported name was shortened during the
+  layout move and is harder to read.
+- Let dictionary errors and whitespace warnings use the path that was actually
+  loaded. `names.Load` takes a path but still says `names.json` in its messages.
+  That matches today's CLI, which always loads `names.json` from the current
+  folder.
+- Tidy how a missing or invalid dictionary is reported. The CLI still logs the
+  underlying error, then prints `Unable to load names.json`, and skips the extra
+  log for malformed JSON by looking at the error text. Behaviour should stay the
+  same unless a change is agreed.
+- Share the PDF test helpers instead of keeping two copies: one in
+  `cmd/fn2fm/pdf_test_helpers_test.go` and the same helpers in
+  `internal/pdfmeta/write_test.go`.
+- Remove or use the unused `withAcc` and `withoutAcc` constants in
+  `internal/filename`. They were already unused before the layout move. The
+  accompaniment parser still checks `+` and `-` as literals.
 
 ## Remaining provenance question
 
