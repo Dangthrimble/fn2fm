@@ -679,3 +679,10 @@ packaging, licensing and update review; it was not adopted.
   original file in place, and exits nonzero when a rename fails.
 - Added a command-level regression that blocks the rename target with a
   directory and checks the diagnostic and exit status.
+
+## Starter dictionary covers README examples (5 October 2026)
+
+- Extended `names.example.json` with the abbreviations used in the README
+  running example and Examples section: `AdAd`, `AnTh`, `DaFo`, `DaHa`,
+  `GbAs`, `JaOc`, `KaJe`, `MoLa` and `RiSm`. README example filenames were
+  left unchanged. Personal `names.json` files remain separate.

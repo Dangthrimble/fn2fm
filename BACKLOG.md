@@ -10,8 +10,6 @@ current usage is in [README.md](README.md).
 - Add command-line help and consider a dry-run option and a success/failure
   summary. Keep these as proposals until their behaviour is defined.
 - Make wildcard/glob handling consistent across macOS and Windows shells.
-- Reconcile README name-code examples with the starter dictionary. Preserve the
-  distinction between the repository example and personal working dictionaries.
 - Extend the existing regression and integration tests as behaviour changes.
   Standalone command and built-executable tests already exist; do not replace
   the suite wholesale or treat integration testing as entirely absent.
