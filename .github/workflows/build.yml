@@ -2,6 +2,7 @@ name: Build and test
 
 on:
   push:
+    branches: ['**']
   pull_request:
   workflow_dispatch:
     inputs:
@@ -92,9 +93,7 @@ jobs:
 
       - name: Identify package version
         run: |
-          if ($env:GITHUB_REF_TYPE -eq 'tag') {
-            $version = $env:GITHUB_REF_NAME
-          } elseif ('${{ inputs.version }}' -ne '') {
+          if ('${{ inputs.version }}' -ne '') {
             $version = '${{ inputs.version }}'
           } else {
             $version = "dev-$env:GITHUB_RUN_NUMBER-$($env:GITHUB_SHA.Substring(0, 12))"

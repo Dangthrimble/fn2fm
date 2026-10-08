@@ -697,4 +697,15 @@ packaging, licensing and update review; it was not adopted.
 - Follow-up polish pointed README and INSTALL at Releases first (Actions
   development packages remain for interim testing), recorded the release in
   the backlog/history, and stamped release packages so `fn2fm --version`
-  reports `v0.1.0` rather than a `dev-…` build id.
+  reports `v0.1.0` rather than a `dev-…` build id. Those v0.1.0 packages were
+  rebuilt from a later polish commit than the tag; see v0.1.1 below for the
+  aligned tag→publish path.
+
+## Tag-triggered releases and v0.1.1 (8 October 2026)
+
+- Added `.github/workflows/release.yml`: pushing a `v*` tag builds the six
+  platform packages stamped with the tag name and publishes a GitHub Release
+  with those assets. Ordinary **Build and test** runs stay on branches, PRs and
+  workflow_dispatch only.
+- Tagged `v0.1.1` on `main` after that workflow landed so the tag commit, package
+  commit and embedded `fn2fm --version` match, with no rebuild footnote.

@@ -7,7 +7,7 @@ See the [backlog](BACKLOG.md) for outstanding work and the
 
 Download numbered releases from the repository's
 [Releases page](https://github.com/Dangthrimble/fn2fm/releases)
-(start with [v0.1.0](https://github.com/Dangthrimble/fn2fm/releases/tag/v0.1.0)).
+(start with [v0.1.1](https://github.com/Dangthrimble/fn2fm/releases/tag/v0.1.1)).
 Each release provides packages for macOS Intel and Apple Silicon, Windows x64
 and ARM64, and Linux x64 and ARM64, with an executable, instructions, checksums,
 the MIT licence and dependency notices. They contain `names.example.json`; your
