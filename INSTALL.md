@@ -8,7 +8,7 @@ are not code-signed or notarised; checksums check integrity only.
 
 Prefer a numbered release from the repository's
 [Releases page](https://github.com/Dangthrimble/fn2fm/releases)
-(for example [v0.1.0](https://github.com/Dangthrimble/fn2fm/releases/tag/v0.1.0)).
+(for example [v0.1.1](https://github.com/Dangthrimble/fn2fm/releases/tag/v0.1.1)).
 Download the Asset for your computer:
 
 - `macos-intel`: a Mac with an Intel processor.
@@ -18,7 +18,7 @@ Download the Asset for your computer:
 - `linux-x64`: an Intel/AMD 64-bit Linux computer.
 - `linux-arm64`: an ARM64 Linux computer running a 64-bit OS.
 
-Release packages are named `fn2fm-v0.1.0-<platform>.zip` (and similarly for later
+Release packages are named `fn2fm-v0.1.1-<platform>.zip` (and similarly for later
 versions). Use `fn2fm --version` to confirm the stamp matches `VERSION.txt`.
 
 For interim testing only, successful **Build and test** runs on the
@@ -122,13 +122,13 @@ Each release Asset includes a `.zip.sha256` file containing the SHA-256 checksum
 of its versioned ZIP. Compare it with the checksum you calculate before extracting:
 
 ```sh
-shasum -a 256 fn2fm-v0.1.0-macos-intel.zip
+shasum -a 256 fn2fm-v0.1.1-macos-intel.zip
 ```
 
 On Linux, use `sha256sum` with the downloaded ZIP filename. In PowerShell, use:
 
 ```powershell
-Get-FileHash -Algorithm SHA256 -LiteralPath 'fn2fm-v0.1.0-windows-x64.zip'
+Get-FileHash -Algorithm SHA256 -LiteralPath 'fn2fm-v0.1.1-windows-x64.zip'
 ```
 
 For development packages from Actions, use the `fn2fm-dev-<run>-<commit>-…`
