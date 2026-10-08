@@ -121,6 +121,7 @@ jobs:
       contents: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
       VERSION: ${{ github.ref_name }}
 
     steps:
@@ -179,7 +180,7 @@ jobs:
           Download \`fn2fm-${VERSION}-<platform>.zip\` for your computer from Assets below, verify the matching \`.sha256\` file, extract, and keep your personal \`names.json\` separate from \`names.example.json\`.
           EOF
           sed -i 's/^          //' "$notes_file"
-          gh release create "$VERSION" --title "fn2fm ${VERSION}" --notes-file "$notes_file"
+          gh release create "$VERSION" --title "fn2fm ${VERSION}" --notes-file "$notes_file" --target "${{ github.sha }}"
 
       - name: Upload release assets
         shell: bash
