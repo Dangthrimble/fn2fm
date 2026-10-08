@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Optional package/version stamp (e.g. v0.1.0)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -85,9 +90,15 @@ jobs:
       - name: Run vet
         run: go vet ./...
 
-      - name: Identify development version
+      - name: Identify package version
         run: |
-          $version = "dev-$env:GITHUB_RUN_NUMBER-$($env:GITHUB_SHA.Substring(0, 12))"
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $version = $env:GITHUB_REF_NAME
+          } elseif ('${{ inputs.version }}' -ne '') {
+            $version = '${{ inputs.version }}'
+          } else {
+            $version = "dev-$env:GITHUB_RUN_NUMBER-$($env:GITHUB_SHA.Substring(0, 12))"
+          }
           "FN2FM_VERSION=$version" >> $env:GITHUB_ENV
 
       - name: Build versioned standalone executable
@@ -102,7 +113,7 @@ jobs:
       - name: Package executable and instructions
         run: go run ./cmd/buildpackage -binary "dist/${{ matrix.binary }}" -version "$env:FN2FM_VERSION"
 
-      - name: Upload development package
+      - name: Upload package
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

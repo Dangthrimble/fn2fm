@@ -96,13 +96,12 @@ is a forScore interoperability issue, not a general filename-normalisation task.
 
 ## Distribution
 
-- Prepare a numbered stable release from the tested MIT-licensed source.
-  Versioned development packages, checksums and native automated checks for the
-  six configured platforms are complete. Use tagged GitHub Releases for durable
-  downloads; current development artifacts require sign-in and expire.
 - Consider dedicated installers and automatic updates. Current packages use
   manual installation and updates as described in [INSTALL.md](INSTALL.md).
+  Numbered GitHub Releases (starting with v0.1.0) provide durable downloads;
+  Actions development artifacts still require sign-in and expire.
 - Consider signing, macOS notarisation and an optional download website.
+  v0.1.0 is an unsigned ZIP distribution; checksums check integrity only.
 - Consider platforms beyond the six configured targets: macOS Intel/Apple Silicon,
   Windows x64/ARM64 and Linux x64/ARM64. All six passed hosted runtime and packaging
   verification on 27 September 2026; see the development history for the run.
