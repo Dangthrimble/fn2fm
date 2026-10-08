@@ -686,3 +686,15 @@ packaging, licensing and update review; it was not adopted.
   running example and Examples section: `AdAd`, `AnTh`, `DaFo`, `DaHa`,
   `GbAs`, `JaOc`, `KaJe`, `MoLa` and `RiSm`. README example filenames were
   left unchanged. Personal `names.json` files remain separate.
+
+## First numbered release v0.1.0 (6–8 October 2026)
+
+- Tagged `v0.1.0` on `main` at `a6266f6` and published a GitHub Release with
+  six-platform packages (macOS Intel/Apple Silicon, Windows x64/ARM64, Linux
+  x64/ARM64) and checksums. PDF Info writing still supports only versions
+  1.4–1.7. Signing, notarisation, dedicated installers and automatic updates
+  are not included; distribution remains manual ZIP install as in INSTALL.md.
+- Follow-up polish pointed README and INSTALL at Releases first (Actions
+  development packages remain for interim testing), recorded the release in
+  the backlog/history, and stamped release packages so `fn2fm --version`
+  reports `v0.1.0` rather than a `dev-…` build id.

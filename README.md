@@ -5,16 +5,23 @@ See the [backlog](BACKLOG.md) for outstanding work and the
 
 ## Downloads and updates
 
-Download versioned development packages from successful **Build and test** runs
-on the repository's [Actions page](https://github.com/Dangthrimble/fn2fm/actions).
-The build workflow produces packages for macOS Intel and Apple Silicon,
-Windows x64 and ARM64, and Linux x64 and ARM64, with
-an executable, instructions, checksums, the MIT licence and dependency notices. They contain
-`names.example.json`; your working `names.json` stays separate.
+Download numbered releases from the repository's
+[Releases page](https://github.com/Dangthrimble/fn2fm/releases)
+(start with [v0.1.0](https://github.com/Dangthrimble/fn2fm/releases/tag/v0.1.0)).
+Each release provides packages for macOS Intel and Apple Silicon, Windows x64
+and ARM64, and Linux x64 and ARM64, with an executable, instructions, checksums,
+the MIT licence and dependency notices. They contain `names.example.json`; your
+working `names.json` stays separate.
+
+Successful **Build and test** runs on the
+[Actions page](https://github.com/Dangthrimble/fn2fm/actions) still publish
+short-lived development packages for interim testing; those require sign-in and
+expire.
 
 See [installation and manual-update instructions](INSTALL.md). Use
-`fn2fm --version` to identify a build. Updates are manual; dedicated installers,
-automatic updates, signing and notarisation are not included in these builds.
+`fn2fm --version` to identify a build. Updates are manual; there is no graphical
+installer or automatic update service. Signing and notarisation are not included;
+checksums check integrity only.
 
 ## Running fn2fm
 

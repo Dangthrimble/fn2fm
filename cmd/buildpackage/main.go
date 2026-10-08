@@ -103,7 +103,11 @@ func packageBinary(binary, version, out string) error {
 			return err
 		}
 	}
-	versionText := fmt.Sprintf("fn2fm %s\nPlatform: %s (%s/%s)\nCommit: %s\nSource modified: %s\nGo: %s\nDevelopment build; updates are manual.\n", version, platform, osName, arch, settings["vcs.revision"], settings["vcs.modified"], info.GoVersion)
+	buildKind := "Development build"
+	if strings.HasPrefix(version, "v") && !strings.HasPrefix(version, "dev-") {
+		buildKind = "Release build"
+	}
+	versionText := fmt.Sprintf("fn2fm %s\nPlatform: %s (%s/%s)\nCommit: %s\nSource modified: %s\nGo: %s\n%s; updates are manual.\n", version, platform, osName, arch, settings["vcs.revision"], settings["vcs.modified"], info.GoVersion, buildKind)
 	files = append(files, entry{"VERSION.txt", []byte(versionText), 0644})
 	licenses, err := dependencyLicenses(info.Deps)
 	if err != nil {
